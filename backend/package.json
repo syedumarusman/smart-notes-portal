@@ -1,0 +1,32 @@
+{
+  "name": "smart-notes-backend",
+  "version": "1.0.0",
+  "description": "Backend API",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "watch": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "debug": "nodemon --inspect src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "axios": "^0.21.0",
+    "boom": "^7.3.0",
+    "joi": "^17.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-compose": "^4.1.0",
+    "koa-router": "^10.0.0",
+    "mongoose": "^5.10.16",
+    "nodemailer": "^6.4.16",
+    "nodemon": "^2.0.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest": "^27.2.4"
+  }
+}
