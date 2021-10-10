@@ -31,8 +31,9 @@ describe("getUser function", () => {
 
     it("should return success response", async () => {
         const userId = "1001"
-        findOne.mockImplementation(() => "Success")
-        expect(await getUser(userId)).toEqual("Success")
+        expectedResponse = { username: "john", email: "john_doe@gmail.com", role: "user" }
+        findOne.mockImplementation(() => expectedResponse)
+        expect(await getUser(userId)).toEqual(expectedResponse)
     })
 })
 

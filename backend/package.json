@@ -4,10 +4,10 @@
   "description": "Backend API",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
     "watch": "nodemon src/index.js",
     "start": "node src/index.js",
-    "debug": "nodemon --inspect src/index.js"
+    "debug": "nodemon --inspect src/index.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
