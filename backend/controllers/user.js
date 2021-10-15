@@ -26,26 +26,40 @@ const getUser = async (ctx) => {
 }
 
 const loginUser = async (ctx) => {
-    const payload = {
+    let payload = {
         email: ctx.request.body.email,
+        username: ctx.request.body.username,
         password: ctx.request.body.password,
     }
-    const { token, userDetails } = await UserHandler.loginUser(payload)
-    ctx.body = {
-        meta: {
-            status: 200,
-            token: token
-        },
-        result: userDetails
+    Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key])
+    if(!payload.email) {
+        const { token, currentUser } = await UserHandler.loginUserWithUsername(payload)
+        ctx.body = {
+            meta: {
+                status: 200,
+                token: token
+            },
+            currentUser
+        }
+    } else {
+        const { token, currentUser } = await UserHandler.loginUserWithEmail(payload)
+        ctx.body = {
+            meta: {
+                status: 200,
+                token: token
+            },
+            currentUser
+        }
     }
 }
 
 const create = async (ctx) => {
     const payload = {
         name: ctx.request.body.name,
+        username: ctx.request.body.username,
         password: ctx.request.body.password,
-        role: ctx.request.body.role? ctx.request.body.role: USER_ROLES.customer,
         email: ctx.request.body.email,
+        role: ctx.request.body.role? ctx.request.body.role: USER_ROLES.customer,
     }
     const response = await UserHandler.create(payload);
     ctx.body = {

@@ -6,9 +6,11 @@
 </template>
 
 <script>
-import Nav from "@/components/Nav";
 export default {
-  components: { Nav },
+  name: "App",
+  components: {
+    Nav: () => import("./components/Nav.vue"),
+  },
 };
 </script>
 

@@ -9,28 +9,41 @@
             :style="{ opacity: isAlertShow ? 1 : 0 }"
           >
             Login successfully. <small>waiting for redirect.</small>
-            <loading-component width="30"></loading-component>
+            <LoadingComponent width="30"></LoadingComponent>
           </div>
           <h1 class="display-3 fw-bold">Login</h1>
           <p class="fw-bold">Welcome back</p>
           <br />
           <form action="">
             <div class="form-group">
-              <lable class="input-label">Email</lable>
-              <input type="email" class="form-control" placeholder="Email" />
+              <div
+                class="alert alert-danger"
+                role="alert"
+                :style="{ opacity: isValid ? 1 : 0 }"
+              >
+                Invalid Login Credentials!
+              </div>
+              <label class="input-label">Username / Email</label>
+              <input
+                type="email"
+                v-model="emailOrUsername"
+                class="form-control"
+                placeholder="eg. john_doe@gmail.com / johndoe"
+              />
             </div>
             <div class="form-group">
-              <lable class="input-label">Password</lable>
+              <label class="input-label">Password</label>
               <input
                 type="password"
+                v-model="password"
                 class="form-control"
-                placeholder="Password"
+                placeholder="Must have at least 6 characters"
               />
             </div>
             <br />
             <div class="form-group d-flex justify-content-center">
               <button
-                class="btn btn-primary w-25"
+                class="btn btn-primary w-100"
                 id="login"
                 @click.prevent="login"
                 v-if="!isLoggingIn"
@@ -38,12 +51,12 @@
                 Login
               </button>
               <button
-                class="btn btn-primary w-25"
+                class="btn btn-primary w-100"
                 disabled
                 @click.prevent="login"
                 v-if="isLoggingIn"
               >
-                <loading-component width="30"></loading-component>
+                <LoadingComponent width="30"></LoadingComponent>
               </button>
             </div>
           </form>
@@ -62,23 +75,50 @@
 </template>
 
 <script>
-import LoadingComponent from "../components/LoadingComponent.vue";
-
 export default {
-  components: { LoadingComponent },
+  name: "Login",
+  components: {
+    LoadingComponent: () => import("../components/LoadingComponent.vue"),
+  },
   data() {
     return {
+      emailOrUsername: "",
+      password: "",
       isLoggingIn: false,
       isAlertShow: false,
+      isValid: false,
     };
   },
   methods: {
-    login() {
+    async login() {
+      if (this.validateEmptyFields()) {
+        this.isValid = true;
+        return;
+      }
       this.isLoggingIn = true;
-      this.redirect();
+      let loginCredentials = {};
+      if (
+        //eslint-disable-next-line
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+          this.emailOrUsername
+        )
+      ) {
+        loginCredentials = {
+          email: this.emailOrUsername,
+          password: this.password,
+        };
+      } else {
+        loginCredentials = {
+          username: this.emailOrUsername,
+          password: this.password,
+        };
+      }
+      await this.$store.dispatch("login", loginCredentials);
+      this.isAlertShow = true;
+      this.$router.push({ name: "about" });
     },
-    redirect() {
-      this.$router.push({ name: "home" });
+    validateEmptyFields: function () {
+      return !this.emailOrUsername.length || !this.password.length;
     },
   },
 };
@@ -91,7 +131,7 @@ export default {
 }
 .login-panel {
   position: relative;
-  padding: 200px 0;
+  padding: 100px 0;
   .alert {
     opacity: 0;
     position: absolute;

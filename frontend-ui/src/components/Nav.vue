@@ -9,19 +9,19 @@
 
       <ul class="navbar-nav mb-2 mb-md-0 justify-content-end">
         <li class="nav-item">
-          <router-link to="/" v-if="!auth_status" class="nav-link"
-            >Login</router-link
-          >
+          <button class="btn btn-outline-light m-2 my-2 my-sm-0" v-if="!auth_status" @click="login">
+            Login
+          </button>
         </li>
         <li class="nav-item">
-          <router-link to="/register" v-if="!auth_status" class="nav-link"
-            >Register</router-link
-          >
+          <button class="btn btn-outline-light m-2 my-2 my-sm-0" v-if="!auth_status" @click="register">
+            Register
+          </button>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link" v-if="auth_status" @click="logout"
-            >Logout</a
-          >
+          <button class="btn btn-outline-danger m-2 my-2 my-sm-0" v-if="auth_status" @click="logout">
+            Logout
+          </button>
         </li>
       </ul>
     </div>
@@ -30,16 +30,22 @@
 
 <script>
 export default {
+  name: "Nav",
   computed: {
     auth_status() {
       return this.$store.getters.getAuthStatus;
     },
   },
   methods: {
-    async logout() {
-      this.$store.dispatch("setAuthToken", "");
-      this.$store.dispatch("setAuthStatus", false);
-      this.router.push("/");
+    login() {
+      this.$router.push('/')
+    },
+    register () {
+      this.$router.push('/register')
+    },
+    logout() {
+      this.$store.dispatch("logout");
+      this.$router.push("/")
     },
   },
 };

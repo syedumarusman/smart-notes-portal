@@ -2,7 +2,7 @@ const Boom = require('boom');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET_KEY } = require('../utils/constants');
-const { createSchema, getUserSchema, resetPasswordSchema, updateSchema, removeSchema, loginUserSchema } = require('../validations/userSchema');
+const { createSchema, getUserSchema, resetPasswordSchema, updateSchema, removeSchema, loginEmailSchema, loginUsernameSchema  } = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
 
 const getAll = async (queryPayload) => {
@@ -22,8 +22,28 @@ const getUser = async (userId) => {
     return user;
 }
 
-const loginUser = async (payload) => {
-    const { error } = loginUserSchema.validate(payload)
+const loginUserWithUsername = async (payload) => {
+    const { error } = loginUsernameSchema.validate(payload)
+    if (error) {
+        throw error;
+    }
+    const user = await User.findOne({ username: payload.username, password: payload.password })
+    if (!user) {
+        throw Boom.badRequest("Username or password is incorrect.");
+    }
+    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "7d" })
+    const currentUser = {
+        userId: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role
+    }
+    return { token, currentUser };
+}
+
+const loginUserWithEmail = async (payload) => {
+    const { error } = loginEmailSchema.validate(payload)
     if (error) {
         throw error;
     }
@@ -32,13 +52,14 @@ const loginUser = async (payload) => {
         throw Boom.badRequest("Email or password is incorrect.");
     }
     const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "7d" })
-    const userDetails = {
+    const currentUser = {
         userId: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role
     }
-    return { token, userDetails };
+    return { token, currentUser };
 }
 
 const create = async (payload) => {
@@ -99,4 +120,4 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUser, create, resetPassword, update, remove }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, create, resetPassword, update, remove }

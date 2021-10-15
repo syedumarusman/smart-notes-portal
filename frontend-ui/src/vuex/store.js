@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import HTTP from "../http-service";
 
 Vue.use(Vuex);
 
@@ -7,6 +8,7 @@ const store = new Vuex.Store({
   state: {
     auth_status: false,
     token: "",
+    currentUser: {},
   },
   mutations: {
     SET_AUTH_STATUS: (state, auth_status) => {
@@ -15,13 +17,34 @@ const store = new Vuex.Store({
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
+    SET_CURRENT_USER: (state, user) => {
+      state.currentUser = user;
+    },
   },
   actions: {
-    setAuthStatus: (commit, auth_status) => {
+    setAuthStatus: ({ commit }, auth_status) => {
       commit("SET_AUTH_STATUS", auth_status);
     },
-    setAuthToken: (commit, token) => {
+    setAuthToken: ({ commit }, token) => {
       commit("SET_TOKEN", token);
+    },
+    login: async ({ commit }, credentials) => {
+      await HTTP.post("user/login", credentials)
+        .then(({ data }) => {
+          const token = data.meta.token;
+          const currentUser = data.currentUser;
+          commit("SET_TOKEN", token);
+          commit("SET_CURRENT_USER", currentUser);
+          commit("SET_AUTH_STATUS", true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    logout: ({ commit }) => {
+      commit("SET_TOKEN", "");
+      commit("SET_CURRENT_USER", {});
+      commit("SET_AUTH_STATUS", false);
     },
   },
   getters: {
