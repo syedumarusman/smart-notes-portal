@@ -31,7 +31,7 @@ const loginUserWithUsername = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Username or password is incorrect.");
     }
-    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "7d" })
+    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
     const currentUser = {
         userId: user._id,
         name: user.name,
@@ -51,7 +51,7 @@ const loginUserWithEmail = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Email or password is incorrect.");
     }
-    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "7d" })
+    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
     const currentUser = {
         userId: user._id,
         name: user.name,

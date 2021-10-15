@@ -1,23 +1,23 @@
-const Router = require('koa-router');
-const controller = require('../controllers/user');
-const auth = require('../utils/authMiddleware')
+const Router = require("koa-router");
+const controller = require("../controllers/user");
+const auth = require("../utils/authMiddleware");
 
 const router = new Router({
-    prefix: '/user'
-})
+  prefix: "/user",
+});
 
-router.post('/login', controller.loginUser);
+router.post("/login", controller.loginUser);
 
-router.get('/', controller.getAll);
+router.get("/", controller.getAll);
 
-router.get('/:userId', controller.getUser);
+router.get("/:userId", controller.getUser);
 
-router.post('/', controller.create);
+router.post("/", controller.registerUser);
 
-router.put('/:userId', controller.update);
+router.put("/:userId", controller.update);
 
-router.post('/resetPassword', controller.resetPassword);
+router.post("/resetPassword", controller.resetPassword);
 
-router.delete('/:userId', auth(['admin']),  controller.remove );
+router.delete("/:userId", auth(["admin"]), controller.remove);
 
 module.exports = router.routes();

@@ -3,6 +3,7 @@ const { USER_ROLES: { admin, user } } = require('../utils/constants');
 
 const createSchema = Joi.object({
     name: Joi.string().required(),
+    username: Joi.string().required(),
     password: Joi.string().required().min(4),
     role: Joi.string().valid(admin, user).required(),
     email: Joi.string().email().required()

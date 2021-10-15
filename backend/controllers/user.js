@@ -53,13 +53,13 @@ const loginUser = async (ctx) => {
     }
 }
 
-const create = async (ctx) => {
+const registerUser = async (ctx) => {
     const payload = {
         name: ctx.request.body.name,
         username: ctx.request.body.username,
         password: ctx.request.body.password,
         email: ctx.request.body.email,
-        role: ctx.request.body.role? ctx.request.body.role: USER_ROLES.customer,
+        role: ctx.request.body.role? ctx.request.body.role: USER_ROLES.user,
     }
     const response = await UserHandler.create(payload);
     ctx.body = {
@@ -111,4 +111,4 @@ const remove = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, create, resetPassword, update, remove }
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, remove }
