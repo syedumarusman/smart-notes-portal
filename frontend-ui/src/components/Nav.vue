@@ -9,17 +9,29 @@
 
       <ul class="navbar-nav mb-2 mb-md-0 justify-content-end">
         <li class="nav-item">
-          <button class="btn btn-outline-light m-2 my-2 my-sm-0" v-if="!auth_status" @click="login">
+          <button
+            class="btn btn-outline-light m-2 my-2 my-sm-0"
+            v-if="!auth_status"
+            @click="login"
+          >
             Login
           </button>
         </li>
         <li class="nav-item">
-          <button class="btn btn-outline-light m-2 my-2 my-sm-0" v-if="!auth_status" @click="register">
+          <button
+            class="btn btn-outline-light m-2 my-2 my-sm-0"
+            v-if="!auth_status"
+            @click="register"
+          >
             Register
           </button>
         </li>
         <li class="nav-item">
-          <button class="btn btn-outline-danger m-2 my-2 my-sm-0" v-if="auth_status" @click="logout">
+          <button
+            class="btn btn-outline-danger m-2 my-2 my-sm-0"
+            v-if="auth_status"
+            @click="logout"
+          >
             Logout
           </button>
         </li>
@@ -38,14 +50,14 @@ export default {
   },
   methods: {
     login() {
-      this.$router.push('/')
+      this.$router.push("/");
     },
-    register () {
-      this.$router.push('/register')
+    register() {
+      this.$router.push("/register");
     },
     logout() {
       this.$store.dispatch("logout");
-      this.$router.push("/")
+      this.$router.push("/");
     },
   },
 };

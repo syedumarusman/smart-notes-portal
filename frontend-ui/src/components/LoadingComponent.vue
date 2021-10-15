@@ -1,18 +1,32 @@
 <template>
   <div class="widget">
-    <div class="loader" :style="{width: width + 'px', height: width + 'px'}"></div>
+    <div
+      class="loader"
+      :style="{ width: width + 'px', height: width + 'px' }"
+    ></div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['width']
-}
+  props: ["width"],
+};
 </script>
 
 <style lang="scss">
-.widget {margin: 20px;height: 50px;text-align: center;}
-.loader {animation: spin 1s linear infinite;-webkit-animation: spin 1s linear infinite;margin: auto;border-radius: 50%;background: transparent;border: 5px solid #ddd;border-top: 5px solid #3490dc;}
+.widget {
+  margin: 20px;
+  text-align: center;
+}
+.loader {
+  animation: spin 1s linear infinite;
+  -webkit-animation: spin 1s linear infinite;
+  margin: auto;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #ddd;
+  border-top: 5px solid #3490dc;
+}
 
 @-webkit-keyframes spin {
   to {

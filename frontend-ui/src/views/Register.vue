@@ -3,19 +3,16 @@
     <div class="row justify-content-center">
       <div class="col-lg-4">
         <div class="login-panel bg-white">
-          <div
-            class="alert alert-primary"
-            role="alert"
-            :style="{ opacity: isAlertShow ? 1 : 0 }"
-          >
-            Registered successfully. <small>waiting for redirect.</small>
-            <LoadingComponent width="30"></LoadingComponent>
-          </div>
           <h1 class="display-3 fw-bold">Register</h1>
           <p class="fw-bold">
-            To stay connected with portal please enter your credentials.
+            To stay connected with our portal, please enter your credentials!
           </p>
           <br />
+          <div class="alert alert-success" role="alert" v-if="isAlertShow">
+              Registered Successfully. waiting for redirect.
+              <LoadingComponent width="10"></LoadingComponent>
+          </div>
+
           <form>
             <div class="form-group">
               <label class="input-label">Name</label>
@@ -66,6 +63,7 @@
             <div class="form-group d-flex justify-content-center">
               <button
                 class="btn btn-primary w-100"
+                v-if="!isLoading"
                 id="login"
                 @click.prevent="login"
               >
@@ -73,6 +71,7 @@
               </button>
               <button
                 class="btn btn-primary w-100"
+                v-if="isLoading"
                 disabled
                 @click.prevent="login"
               >
@@ -99,7 +98,8 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
-      isAlertShow: "",
+      isAlertShow: false,
+      isLoading: false,
     };
   },
 };
