@@ -31,11 +31,30 @@ const store = new Vuex.Store({
     login: async ({ commit }, credentials) => {
       await HTTP.post("user/login", credentials)
         .then(({ data }) => {
+          console.log("Data:", data);
           const token = data.meta.token;
           const currentUser = data.currentUser;
-          commit("SET_TOKEN", token);
-          commit("SET_CURRENT_USER", currentUser);
-          commit("SET_AUTH_STATUS", true);
+          const message = data.meta.message;
+          if(!message){
+            commit("SET_TOKEN", token);
+            commit("SET_CURRENT_USER", currentUser);
+            commit("SET_AUTH_STATUS", true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    register: async ({ commit }, information) => {
+      commit("SET_AUTH_STATUS", false); //Just to call commit to prevent err
+      await HTTP.post("user/register", information)
+        .then(({ data }) => {
+          console.log("Data:", data);
+          const message = data.meta.message;
+          console.log("Message: ", message)
+          if (!message){
+            console.log("Register Successful!")
+          }
         })
         .catch((error) => {
           console.log(error);

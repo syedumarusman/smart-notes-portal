@@ -23,7 +23,7 @@
               >
                 Invalid Login Credentials!
               </div>
-              <label class="input-label">Username / Email</label>
+              <label class="input-label">Email / Username</label>
               <input
                 type="email"
                 v-model="emailOrUsername"
@@ -113,9 +113,18 @@ export default {
           password: this.password,
         };
       }
-      await this.$store.dispatch("login", loginCredentials);
-      this.isAlertShow = true;
-      this.$router.push({ name: "about" });
+      await this.$store.dispatch("login", loginCredentials)
+      const token = this.$store.getters.getToken;
+      console.log("token", token)
+      if (token != ""){
+        this.isAlertShow = true;
+        this.$router.push({ name: "about" });
+      }
+      else {
+        this.isAlertShow = false;
+        this.isLoggingIn = false;
+        this.isValid = true;
+      }
     },
     validateEmptyFields: function () {
       return !this.emailOrUsername.length || !this.password.length;
@@ -131,7 +140,7 @@ export default {
 }
 .login-panel {
   position: relative;
-  padding: 100px 0;
+  padding: 50px 0;
   .alert {
     opacity: 0;
     position: absolute;

@@ -12,7 +12,7 @@ router.get("/", controller.getAll);
 
 router.get("/:userId", controller.getUser);
 
-router.post("/", controller.registerUser);
+router.post("/register", controller.registerUser);
 
 router.put("/:userId", controller.update);
 
