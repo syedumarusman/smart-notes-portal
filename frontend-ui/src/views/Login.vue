@@ -3,24 +3,12 @@
     <div class="row justify-content-center">
       <div class="col-lg-4">
         <div class="login-panel bg-white text-left">
-          <div
-            class="alert alert-primary"
-            role="alert"
-            :style="{ opacity: isAlertShow ? 1 : 0 }"
-          >
-            Login successfully. <small>waiting for redirect.</small>
-            <LoadingComponent width="30"></LoadingComponent>
-          </div>
           <h1 class="display-3 fw-bold">Login</h1>
           <p class="fw-bold">Welcome back</p>
           <br />
           <form action="">
             <div class="form-group">
-              <div
-                class="alert alert-danger"
-                role="alert"
-                :style="{ opacity: isValid ? 1 : 0 }"
-              >
+              <div class="alert alert-danger" role="alert" v-if="isValid">
                 Invalid Login Credentials!
               </div>
               <label class="input-label">Email / Username</label>
@@ -89,6 +77,15 @@ export default {
       isValid: false,
     };
   },
+  watch: {
+    isValid(newVal) {
+      if (newVal) {
+        setTimeout(() => {
+          this.isValid = !this.isValid;
+        }, 5000);
+      }
+    },
+  },
   methods: {
     async login() {
       if (this.validateEmptyFields()) {
@@ -113,14 +110,12 @@ export default {
           password: this.password,
         };
       }
-      await this.$store.dispatch("login", loginCredentials)
+      await this.$store.dispatch("login", loginCredentials);
       const token = this.$store.getters.getToken;
-      console.log("token", token)
-      if (token != ""){
+      if (token != "") {
         this.isAlertShow = true;
-        this.$router.push({ name: "about" });
-      }
-      else {
+        this.$router.push({ name: "dashboard" });
+      } else {
         this.isAlertShow = false;
         this.isLoggingIn = false;
         this.isValid = true;
@@ -141,25 +136,6 @@ export default {
 .login-panel {
   position: relative;
   padding: 50px 0;
-  .alert {
-    opacity: 0;
-    position: absolute;
-    width: 100%;
-    top: 100px;
-    transition: all 0.5s;
-    &.alert-primary {
-      background-color: #007bff;
-      color: #fff;
-      font-size: 18px;
-      border: none;
-    }
-    .widget {
-      position: absolute;
-      right: 5px;
-      top: 0;
-      margin: 10px;
-    }
-  }
 }
 .register-link {
   margin-top: 20px;

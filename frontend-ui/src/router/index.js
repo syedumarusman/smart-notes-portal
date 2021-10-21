@@ -4,8 +4,8 @@ const Login = () =>
   import(/* webpackChunkName: "login" */ "../views/Login.vue");
 const Register = () =>
   import(/* webpackChunkName: "register" */ "../views/Register.vue");
-const About = () =>
-  import(/* webpackChunkName: "about" */ "../views/About.vue");
+const Dashboard = () =>
+  import(/* webpackChunkName: "about" */ "../views/Dashboard.vue");
 
 Vue.use(VueRouter);
 
@@ -21,9 +21,9 @@ const routes = [
     component: Register,
   },
   {
-    path: "/about",
-    name: "about",
-    component: About,
+    path: "/dashboard",
+    name: "dashboard",
+    component: Dashboard,
   },
 ];
 

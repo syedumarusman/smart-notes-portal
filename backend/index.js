@@ -27,7 +27,7 @@ app.use(async function validationMiddleware(ctx, next) {
         }
         ctx.body = {
             "meta": {
-                "status code": status,
+                "status_code": status,
                 "error": name,
                 "message": message 
             }

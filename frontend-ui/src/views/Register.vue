@@ -8,39 +8,31 @@
             To stay connected with our portal, please enter your credentials!
           </p>
           <div
-            class="alert-message alert-danger alert-dismissable"
+            class="alert alert-danger alert-dismissable"
             role="alert"
             v-if="isInvalidPasswords"
           >
             Passwords Do Not Match!
           </div>
           <div
-            class="alert-message alert-danger"
+            class="alert alert-danger"
             role="alert"
             v-else-if="isInvalidEmail"
           >
             Invalid Email Address!
           </div>
           <div
-            class="alert-message alert-danger"
+            class="alert alert-danger"
             role="alert"
             v-else-if="isInvalidFields"
           >
-            Error, Fields Cannot Be Empty!
+            Input Fields Cannot Be Empty!
           </div>
-          <div
-            class="alert-message alert-danger"
-            role="alert"
-            v-else-if="isInvalid"
-          >
-            Error, Email / Username has already been taken.
+          <div class="alert alert-danger" role="alert" v-else-if="isInvalid">
+            {{ error }}
           </div>
           <br />
-          <div class="alert alert-success" role="alert" v-if="isAlertShow">
-              Registered Successfully. waiting for redirect.
-              <LoadingComponent width="30"></LoadingComponent>
-          </div>
-  
+
           <form>
             <div class="form-group">
               <label class="input-label">Name</label>
@@ -126,7 +118,7 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
-      isAlertShow: false,
+      error: "",
       isRegistering: false,
       isInvalid: false,
       isInvalidPasswords: false,
@@ -134,17 +126,24 @@ export default {
       isInvalidEmail: false,
     };
   },
+  watch: {
+    isInvalid(newVal) {
+      if (newVal) {
+        setTimeout(() => {
+          this.isInvalid = !this.isInvalid;
+        }, 5000);
+      }
+    },
+  },
   methods: {
     async register() {
       if (this.validateFields()) {
         this.isInvalidFields = true;
         return;
-      }
-      else if (!this.validatePasswords()){
+      } else if (!this.validatePasswords()) {
         this.isInvalidPasswords = true;
         return;
-      }
-      else if (!this.validateEmail()){
+      } else if (!this.validateEmail()) {
         this.isInvalidEmail = true;
         return;
       }
@@ -159,33 +158,38 @@ export default {
         role: "user",
       };
 
-      // Not implemented completely, was trying to figure out
-      // how to check if registration failed out here rather than in store.
-      try{
-        await this.$store.dispatch("register", registerInformation);
-        this.isAlertShow = true;
-        this.$router.push({ name: "login" })
-      }
-      catch(err){
-        console.log("Error:", err)
-        this.isRegistering = false;
-        this.isAlertShow = false;
+      const response = await this.$store.dispatch(
+        "register",
+        registerInformation
+      );
+      this.isRegistering = false;
+      if (
+        response &&
+        response.data.meta &&
+        response.data.meta.status_code == 400
+      ) {
         this.isInvalid = true;
+        const { error, message } = response.data.meta;
+        this.error = error + ": " + message + "!";
+        return;
       }
+      this.$router.push({ name: "login" });
     },
     validatePasswords: function () {
-      return (this.password == this.confirmPassword);
+      return this.password == this.confirmPassword;
     },
     validateEmail: function () {
       //eslint-disable-next-line
-      return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email))
+      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email);
     },
     validateFields: function () {
-      return !this.name.length || 
-             !this.email.length ||
-             !this.username.length ||
-             !this.password.length ||
-             !this.confirmPassword.length;
+      return (
+        !this.name.length ||
+        !this.email.length ||
+        !this.username.length ||
+        !this.password.length ||
+        !this.confirmPassword.length
+      );
     },
   },
 };
@@ -199,24 +203,5 @@ export default {
 .register-panel {
   position: relative;
   margin-bottom: 50px;
-  .alert {
-    opacity: 0;
-    width: 100%;
-    margin: 0;
-    top: 10px;
-    transition: all 0.5s;
-    &.alert-primary {
-      background-color: #007bff;
-      color: #fff;
-      font-size: 18px;
-      border: none;
-    }
-    .widget {
-      position: absolute;
-      right: 5px;
-      top: 0;
-      margin: 10px;
-    }
-  }
 }
 </style>
