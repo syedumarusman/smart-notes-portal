@@ -2,8 +2,8 @@
   <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
     <div class="container-fluid">
       <div class="dashboard-margin justify-content-start">
-        <router-link to="/" v-if="auth_status" class="navbar-brand"
-          >Dashboard</router-link
+        <router-link to="/dashboard" class="navbar-brand"
+          >Smart Notes</router-link
         >
       </div>
 
@@ -13,6 +13,7 @@
             class="btn btn-outline-light m-2 my-2 my-sm-0"
             v-if="!auth_status"
             @click="login"
+            :disabled="disableLoginButton"
           >
             Login
           </button>
@@ -22,6 +23,7 @@
             class="btn btn-outline-light m-2 my-2 my-sm-0"
             v-if="!auth_status"
             @click="register"
+            :disabled="disbableRegisterButton"
           >
             Register
           </button>
@@ -46,6 +48,12 @@ export default {
   computed: {
     auth_status() {
       return this.$store.getters.getAuthStatus;
+    },
+    disableLoginButton() {
+      return this.$route.name === "login";
+    },
+    disbableRegisterButton() {
+      return this.$route.name === "register";
     },
   },
   methods: {
