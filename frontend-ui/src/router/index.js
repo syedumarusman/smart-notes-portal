@@ -7,12 +7,13 @@ const Register = () =>
   import(/* webpackChunkName: "register" */ "../views/Register.vue");
 const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue");
+const Home = () => import(/* webpackChunkName: "home" */ "../views/Home.vue");
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/login",
     name: "login",
     component: Login,
   },
@@ -22,12 +23,18 @@ const routes = [
     component: Register,
   },
   {
-    path: "/dashboard",
-    name: "dashboard",
-    component: Dashboard,
+    path: "/",
+    redirect: "/dashboard",
+    component: Home,
     meta: {
       requiresAuth: true,
     },
+    children: [
+      {
+        path: "/dashboard",
+        component: Dashboard,
+      },
+    ],
   },
 ];
 

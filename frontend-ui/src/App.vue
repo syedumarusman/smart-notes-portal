@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Nav />
+    <Navbar v-if="!auth_status" />
     <router-view />
   </div>
 </template>
@@ -9,7 +9,12 @@
 export default {
   name: "App",
   components: {
-    Nav: () => import("./components/Nav.vue"),
+    Navbar: () => import("./components/Navbar.vue"),
+  },
+  computed: {
+    auth_status() {
+      return this.$store.getters.getAuthStatus;
+    },
   },
 };
 </script>
@@ -19,6 +24,8 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  margin: 0;
   text-align: center;
   color: #2c3e50;
 }

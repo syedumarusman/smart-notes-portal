@@ -1,22 +1,32 @@
 <template>
-  <div class="home">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <div>
+    <HomeNavbar v-if="auth_status"></HomeNavbar>
+    <SidebarMenu></SidebarMenu>
+    <div class="main-container">
+      <router-view />
     </div>
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-
+import HomeNavbar from "../components/HomeNavbar.vue";
+import SidebarMenu from "../components/SidebarMenu.vue";
 export default {
   name: "Home",
-  components: {
-    HelloWorld,
+  components: { SidebarMenu, HomeNavbar },
+  computed: {
+    auth_status() {
+      return this.$store.getters.getAuthStatus;
+    },
   },
 };
 </script>
+
+<style>
+.main-container {
+    position: absolute;
+    top: 80px;
+    left: 90px;
+    right: 0;
+    bottom: 0;
+}</style>

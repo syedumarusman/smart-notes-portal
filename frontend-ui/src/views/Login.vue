@@ -114,7 +114,7 @@ export default {
       const token = this.$store.getters.getToken;
       if (token != "") {
         this.isAlertShow = true;
-        this.$router.push({ name: "dashboard" });
+        this.$router.push("/");
       } else {
         this.isAlertShow = false;
         this.isLoggingIn = false;
