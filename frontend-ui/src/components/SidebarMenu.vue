@@ -20,24 +20,24 @@
         <a
           href="#"
           class="nav-link"
-          :class="[focusDashboard? 'active': 'text-secondary'] "
+          :class="[focusDashboard ? 'active' : 'text-secondary']"
           @click="setFocus(DASHBOARD)"
         >
           <h4>
-            <small><i class="bi bi-house-fill"></i></small>          
+            <small><i class="bi bi-house-fill"></i></small>
             <span>&nbsp;Dashboard</span>
-          </h4> 
+          </h4>
         </a>
       </li>
       <li class="nav-item">
         <a
           href="#"
           class="nav-link"
-          :class="[focusManuscript? 'active': 'text-secondary']"
+          :class="[focusManuscript ? 'active' : 'text-secondary']"
           @click="setFocus(MANUSCRIPT)"
         >
           <h4>
-            <small><i class="bi bi-journal-text"></i></small>          
+            <small><i class="bi bi-journal-text"></i></small>
             <span>&nbsp;Manuscript</span>
           </h4>
         </a>
@@ -46,11 +46,11 @@
         <a
           href="#"
           class="nav-link"
-          :class="[focusSummary? 'active': 'text-secondary']"
+          :class="[focusSummary ? 'active' : 'text-secondary']"
           @click="setFocus(SUMMARY)"
         >
           <h4>
-            <small><i class="bi bi-file-text"></i></small>  
+            <small><i class="bi bi-file-text"></i></small>
             <span>&nbsp;Summary</span>
           </h4>
         </a>
@@ -59,11 +59,11 @@
         <a
           href="#"
           class="nav-link"
-          :class="[focusFeedback? 'active': 'text-secondary']"
+          :class="[focusFeedback ? 'active' : 'text-secondary']"
           @click="setFocus(FEEDBACK)"
         >
           <h4>
-            <small><i class="bi bi-chat-left-dots"></i></small>          
+            <small><i class="bi bi-chat-left-dots"></i></small>
             <span>&nbsp;Feedback</span>
           </h4>
         </a>
@@ -102,10 +102,25 @@ export default {
   methods: {
     setFocus(currentTab) {
       this.currentTab = currentTab;
+      switch(currentTab) {
+        case "dashboard":
+          this.$router.push("/dashboard");
+          break;
+        case "manuscript":
+          this.$router.push("/manuscript");
+          break;
+        case "summary":
+          this.$router.push("/summary");
+          break;
+        case "feedback":
+          this.$router.push("/feedback");
+          break;
+        default:
+          this.$router.push("/dashboard")
+      } 
     },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

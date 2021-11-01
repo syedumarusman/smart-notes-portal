@@ -5,9 +5,15 @@ const Login = () =>
   import(/* webpackChunkName: "login" */ "../views/Login.vue");
 const Register = () =>
   import(/* webpackChunkName: "register" */ "../views/Register.vue");
+const Home = () => import(/* webpackChunkName: "home" */ "../views/Home.vue");
 const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue");
-const Home = () => import(/* webpackChunkName: "home" */ "../views/Home.vue");
+const Manuscript = () =>
+  import(/* webpackChunkName: "manuscript" */ "../views/Manuscript.vue");
+const Summary = () =>
+  import(/* webpackChunkName: "summary" */ "../views/Summary.vue");
+const Feedback = () =>
+  import(/* webpackChunkName: "feedback" */ "../views/Feedback.vue");
 
 Vue.use(VueRouter);
 
@@ -33,6 +39,18 @@ const routes = [
       {
         path: "/dashboard",
         component: Dashboard,
+      },
+      {
+        path: "/manuscript",
+        component: Manuscript,
+      },
+      {
+        path: "/summary",
+        component: Summary,
+      },
+      {
+        path: "/feedback",
+        component: Feedback,
       },
     ],
   },
