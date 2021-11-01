@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row">
       <div class="col">
         <div class="card bg-c-blue order-card">

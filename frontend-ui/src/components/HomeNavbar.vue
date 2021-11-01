@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="container-fluid">
       <div class="title-position justify-content-start">
         <router-link to="/" class="navbar-brand">Smart Notes</router-link>

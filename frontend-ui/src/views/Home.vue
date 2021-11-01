@@ -1,9 +1,15 @@
 <template>
   <div>
     <HomeNavbar v-if="auth_status"></HomeNavbar>
-    <SidebarMenu></SidebarMenu>
-    <div class="main-container">
-      <router-view />
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 d-none d-md-block sidebar">
+          <SidebarMenu></SidebarMenu>
+        </div>
+        <div class="col-md-9 ml-sm-auto col-lg-10 pt-3 pe-4 ps-0">
+          <router-view />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -23,10 +29,10 @@ export default {
 </script>
 
 <style>
-.main-container {
-    position: absolute;
-    top: 80px;
-    left: 90px;
-    right: 0;
-    bottom: 0;
-}</style>
+.container-fluid {
+    padding-right:0;
+    padding-left:0;
+    margin-right:auto;
+    margin-left:auto
+ }
+</style>
