@@ -6,7 +6,7 @@
           <div class="card-block">
             <h3 class="m-b-20">Manuscript Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-journal-check f-left"></i><span>6</span>
+              <i class="bi bi-file-earmark-text f-left"></i><span>6</span>
             </h1>
           </div>
         </div>

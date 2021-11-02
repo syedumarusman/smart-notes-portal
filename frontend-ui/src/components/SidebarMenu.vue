@@ -37,7 +37,7 @@
           @click="setFocus(MANUSCRIPT)"
         >
           <h4>
-            <small><i class="bi bi-journal-text"></i></small>
+            <small><i class="bi bi-file-earmark-text-fill"></i></small>
             <span>&nbsp;Manuscript</span>
           </h4>
         </a>
@@ -50,7 +50,7 @@
           @click="setFocus(SUMMARY)"
         >
           <h4>
-            <small><i class="bi bi-file-text"></i></small>
+            <small><i class="bi bi-file-text-fill"></i></small>
             <span>&nbsp;Summary</span>
           </h4>
         </a>
@@ -63,7 +63,7 @@
           @click="setFocus(FEEDBACK)"
         >
           <h4>
-            <small><i class="bi bi-chat-left-dots"></i></small>
+            <small><i class="bi bi-chat-left-dots-fill"></i></small>
             <span>&nbsp;Feedback</span>
           </h4>
         </a>
