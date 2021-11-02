@@ -18,9 +18,10 @@
     <ul class="nav flex-column">
       <li class="nav-item">
         <a
-          href="#"
           class="nav-link"
-          :class="[focusDashboard ? 'active' : 'text-secondary']"
+          :class="[
+            focusDashboard ? 'active selected' : 'text-secondary set-cursor',
+          ]"
           @click="setFocus(DASHBOARD)"
         >
           <h4>
@@ -31,9 +32,10 @@
       </li>
       <li class="nav-item">
         <a
-          href="#"
           class="nav-link"
-          :class="[focusManuscript ? 'active' : 'text-secondary']"
+          :class="[
+            focusManuscript ? 'active selected' : 'text-secondary set-cursor',
+          ]"
           @click="setFocus(MANUSCRIPT)"
         >
           <h4>
@@ -44,9 +46,10 @@
       </li>
       <li class="nav-item">
         <a
-          href="#"
           class="nav-link"
-          :class="[focusSummary ? 'active' : 'text-secondary']"
+          :class="[
+            focusSummary ? 'active selected' : 'text-secondary set-cursor',
+          ]"
           @click="setFocus(SUMMARY)"
         >
           <h4>
@@ -57,9 +60,10 @@
       </li>
       <li class="nav-item">
         <a
-          href="#"
           class="nav-link"
-          :class="[focusFeedback ? 'active' : 'text-secondary']"
+          :class="[
+            focusFeedback ? 'active selected' : 'text-secondary set-cursor',
+          ]"
           @click="setFocus(FEEDBACK)"
         >
           <h4>
@@ -75,14 +79,13 @@
 <script>
 export default {
   name: "SidebarMenu",
-  props: [],
   data() {
     return {
       DASHBOARD: "dashboard",
       MANUSCRIPT: "manuscript",
       SUMMARY: "summary",
       FEEDBACK: "feedback",
-      currentTab: "",
+      currentTab: "dashboard",
     };
   },
   computed: {
@@ -102,7 +105,7 @@ export default {
   methods: {
     setFocus(currentTab) {
       this.currentTab = currentTab;
-      switch(currentTab) {
+      switch (currentTab) {
         case "dashboard":
           this.$router.push("/dashboard");
           break;
@@ -116,11 +119,19 @@ export default {
           this.$router.push("/feedback");
           break;
         default:
-          this.$router.push("/dashboard")
-      } 
+          this.$router.push("/dashboard");
+      }
     },
   },
 };
 </script>
 
-<style></style>
+<style>
+.selected {
+  pointer-events: none;
+  cursor: default;
+}
+.set-cursor {
+  cursor: pointer;
+}
+</style>

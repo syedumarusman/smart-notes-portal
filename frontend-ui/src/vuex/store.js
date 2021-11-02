@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import HTTP from "../http-service";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
@@ -57,6 +58,11 @@ const store = new Vuex.Store({
       return state.token;
     },
   },
+  plugins: [
+    createPersistedState({
+      storage: window.sessionStorage,
+    }),
+  ],
 });
 
 export default store;

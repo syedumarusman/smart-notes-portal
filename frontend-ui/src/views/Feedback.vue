@@ -1,17 +1,15 @@
 <template>
-    <div class="row">
-        <div class="col">
-            <h2>Feedback</h2>
-        </div>
+  <div class="row">
+    <div class="col">
+      <h2>Feedback</h2>
     </div>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "Feedback"
-}
+  name: "Feedback",
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -38,19 +38,35 @@ const routes = [
     children: [
       {
         path: "/dashboard",
+        name: "dashboard",
         component: Dashboard,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
         path: "/manuscript",
+        name: "manuscript",
         component: Manuscript,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
         path: "/summary",
+        name: "summary",
         component: Summary,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
         path: "/feedback",
+        name: "feedback",
         component: Feedback,
+        meta: {
+          requiresAuth: true,
+        },
       },
     ],
   },
