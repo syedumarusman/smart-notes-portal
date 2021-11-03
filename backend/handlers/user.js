@@ -1,6 +1,6 @@
 const Boom = require('boom');
 const User = require('../models/user');
-const jwt = require('jsonwebtoken');
+const { getNewToken } = require("../utils/jwtService")
 const { JWT_SECRET_KEY } = require('../utils/constants');
 const { createSchema, getUserSchema, resetPasswordSchema, updateSchema, removeSchema, loginEmailSchema, loginUsernameSchema  } = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
@@ -31,7 +31,10 @@ const loginUserWithUsername = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Username or password is incorrect.");
     }
-    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
+    // Makes function untestable 
+    // const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
+    
+    const token = getNewToken(JWT_SECRET_KEY, user)
     const currentUser = {
         userId: user._id,
         name: user.name,
@@ -39,7 +42,8 @@ const loginUserWithUsername = async (payload) => {
         email: user.email,
         role: user.role
     }
-    return { token, currentUser };
+    const response = { token, currentUser }
+    return response;
 }
 
 const loginUserWithEmail = async (payload) => {
@@ -51,7 +55,10 @@ const loginUserWithEmail = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Email or password is incorrect.");
     }
-    const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
+    // Makes function untestable 
+    // const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
+
+    const token = getNewToken(JWT_SECRET_KEY, user)
     const currentUser = {
         userId: user._id,
         name: user.name,
@@ -59,10 +66,11 @@ const loginUserWithEmail = async (payload) => {
         email: user.email,
         role: user.role
     }
-    return { token, currentUser };
+    const response = { token, currentUser }
+    return response;
 }
 
-const create = async (payload) => {
+const createUser = async (payload) => {
     const { error } = createSchema.validate(payload, { allowUnknown: true });
     if (error) {
         throw error;
@@ -120,4 +128,4 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, create, resetPassword, update, remove }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, remove }

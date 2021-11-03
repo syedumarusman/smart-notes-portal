@@ -61,7 +61,7 @@ const registerUser = async (ctx) => {
         email: ctx.request.body.email,
         role: ctx.request.body.role? ctx.request.body.role: USER_ROLES.user,
     }
-    const response = await UserHandler.create(payload);
+    const response = await UserHandler.createUser(payload);
     ctx.body = {
         meta: {
             status: 200
