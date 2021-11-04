@@ -9,8 +9,10 @@
           class="mr-3 rounded-circle img-thumbnail shadow-sm"
         />
         <div class="media-body">
-          <h4 class="m-0">Test1</h4>
-          <p class="font-weight-light text-muted mb-0">Full Stack developer</p>
+          <h4 class="m-0">{{ userDetails.name }}</h4>
+          <p class="font-weight-light text-muted mb-0">
+            {{ userDetails.email }}
+          </p>
         </div>
       </div>
     </div>
@@ -89,6 +91,9 @@ export default {
     };
   },
   computed: {
+    userDetails() {
+      return this.$store.getters.getCurrentUser;
+    },
     focusDashboard() {
       return this.currentTab == "dashboard";
     },

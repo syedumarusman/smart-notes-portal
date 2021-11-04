@@ -57,6 +57,9 @@ const store = new Vuex.Store({
     getToken(state) {
       return state.token;
     },
+    getCurrentUser(state) {
+      return state.currentUser;
+    },
   },
   plugins: [
     createPersistedState({
