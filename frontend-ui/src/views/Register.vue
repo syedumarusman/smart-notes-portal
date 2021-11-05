@@ -7,31 +7,9 @@
           <p class="fw-bold">
             To stay connected with our portal, please enter your credentials!
           </p>
-          <div
-            class="alert alert-danger alert-dismissable"
-            role="alert"
-            v-if="isInvalidPasswords"
-          >
-            Passwords Do Not Match!
+          <div class="alert alert-danger" role="alert" v-if="errorType != null">
+            {{ errorMessages[errorType] }}
           </div>
-          <div
-            class="alert alert-danger"
-            role="alert"
-            v-else-if="isInvalidEmail"
-          >
-            Invalid Email Address!
-          </div>
-          <div
-            class="alert alert-danger"
-            role="alert"
-            v-else-if="isInvalidFields"
-          >
-            Input Fields Cannot Be Empty!
-          </div>
-          <div class="alert alert-danger" role="alert" v-else-if="isInvalid">
-            {{ error }}
-          </div>
-          <br />
 
           <form>
             <div class="form-group">
@@ -118,39 +96,39 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
-      error: "",
+      errorType: null,
+      errorMessages: {
+        1: "Input fields cannot be empty!",
+        2: "Passwords do not match!",
+        3: "Invalid email address!",
+        4: "",
+      },
       isRegistering: false,
-      isInvalid: false,
-      isInvalidPasswords: false,
-      isInvalidFields: false,
-      isInvalidEmail: false,
     };
   },
   watch: {
-    isInvalid(newVal) {
-      if (newVal) {
-        setTimeout(() => {
-          this.isInvalid = !this.isInvalid;
-        }, 5000);
-      }
+    errorType(newVal) {
+      console.log(newVal);
+      setTimeout(() => {
+        this.errorType = null;
+      }, 4000);
     },
   },
   methods: {
     async register() {
       if (this.validateFields()) {
-        this.isInvalidFields = true;
+        this.errorType = 1;
         return;
       } else if (!this.validatePasswords()) {
-        this.isInvalidPasswords = true;
+        this.errorType = 2;
         return;
       } else if (!this.validateEmail()) {
-        this.isInvalidEmail = true;
+        this.errorType = 3;
         return;
       }
       this.isRegistering = true;
-      let registerInformation = {};
 
-      registerInformation = {
+      let registerInformation = {
         name: this.name,
         email: this.email,
         username: this.username,
@@ -168,9 +146,9 @@ export default {
         response.data.meta &&
         response.data.meta.status_code == 400
       ) {
-        this.isInvalid = true;
+        this.errorType = 4;
         const { error, message } = response.data.meta;
-        this.error = error + ": " + message + "!";
+        this.errorMessages[this.errorType] = error + ": " + message + "!";
         return;
       }
       this.$router.push({ name: "login" });
