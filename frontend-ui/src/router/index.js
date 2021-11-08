@@ -78,8 +78,9 @@ const router = new VueRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (to.matched.some((route) => route.meta.requiresAuth)) {
+    await Store.dispatch("verifyToken");
     if (Store.state.auth_status) {
       next();
     } else {

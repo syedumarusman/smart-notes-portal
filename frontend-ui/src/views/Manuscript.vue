@@ -2,10 +2,14 @@
   <div class="row">
     <div class="col">
       <h2>Manuscript</h2>
-      <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+      <div class="alert alert-danger" role="alert" v-if="invalidFileType">
+        {{ invalidFileError }}
+      </div>
+      <input type="file" id="file" v-on:change="handleFileUpload($event)" />
       <button
         class="btn btn-primary"
         id="generateManuscript"
+        :disabled="!isDisabled"
         @click.prevent="generateManuscript"
       >
         Generate
@@ -17,31 +21,41 @@
 <script>
 export default {
   name: "Manuscript",
-
+  data() {
+    return {
+      file: "",
+      invalidFileType: false,
+      invalidFileError: "Invalid file type. Please upload a wav file!",
+    };
+  },
+  computed: {
+    isDisabled() {
+      return typeof this.file == "object";
+    },
+  },
+  watch: {
+    invalidFileType() {
+      setTimeout(() => {
+        this.invalidFileType = false;
+      }, 4000);
+    },
+  },
   methods: {
-    handleFileUpload(){
-      this.file = this.$refs.file.files[0];
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file.type == "audio/wav") {
+        this.file = file;
+      } else {
+        this.invalidFileType = true;
+      }
     },
     async generateManuscript() {
-      let formData = new FormData();
-
-      formData.append('file', this.file);
-
-      // axios.post( '/upload',
-      //     formData,
-      //     {
-      //     headers: {
-      //         'Accept': 'application/json',
-      //         'Content-Type': 'multipart/form-data'
-      //     }
-      //   }
-      // )
-      // .then(function(){
-      //     console.log('success');
-      // })
-      // .catch(function(){
-      //     console.log('failed');
-      // });
+      const response = await this.$store.dispatch(
+        "generateManuscript",
+        this.file
+      );
+      console.log(response);
+      console.log("inside generate manuscript");
     },
   },
 };

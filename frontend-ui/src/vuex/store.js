@@ -42,7 +42,29 @@ const store = new Vuex.Store({
       });
     },
     register: async (context, information) => {
-      return await HTTP.post("user/register", information);
+      return HTTP.post("user/register", information);
+    },
+    verifyToken: async ({ state, dispatch }) => {
+      return HTTP.get("/checkAuthToken", {
+        params: { token: state.token },
+      }).then(({ data }) => {
+        if (data && data.tokenExpired) {
+          dispatch("logout");
+        }
+      });
+    },
+    refreshToken: async (context, currentUser) => {
+      return HTTP.post("/refreshToken", currentUser);
+    },
+    generateManuscript: async ({ getters }, file) => {
+      const userId = getters.getCurrentUser.userId;
+      let formData = new FormData();
+      formData.append("file", file);
+      return HTTP.post(`user/${userId}/generateManuscript`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");

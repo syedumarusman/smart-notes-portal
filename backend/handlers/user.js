@@ -2,8 +2,11 @@ const Boom = require('boom');
 const User = require('../models/user');
 const { getNewToken } = require("../utils/jwtService")
 const { JWT_SECRET_KEY } = require('../utils/constants');
-const { createSchema, getUserSchema, resetPasswordSchema, updateSchema, removeSchema, loginEmailSchema, loginUsernameSchema  } = require('../validations/userSchema');
+const ValidationSchemas = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
+const { Storage } = require('@google-cloud/storage');
+const fs = require('fs');
+const path = require('path');
 
 const getAll = async (queryPayload) => {
     Object.keys(queryPayload).forEach(key => queryPayload[key] === undefined ? delete queryPayload[key] : {});
@@ -11,7 +14,7 @@ const getAll = async (queryPayload) => {
 }
 
 const getUser = async (userId) => {
-    const { error } = getUserSchema.validate({ userId })
+    const { error } = ValidationSchemas.getUserSchema.validate({ userId })
     if (error) {
         throw error;
     }
@@ -23,7 +26,7 @@ const getUser = async (userId) => {
 }
 
 const loginUserWithUsername = async (payload) => {
-    const { error } = loginUsernameSchema.validate(payload)
+    const { error } = ValidationSchemas.loginUsernameSchema.validate(payload)
     if (error) {
         throw error;
     }
@@ -31,10 +34,6 @@ const loginUserWithUsername = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Username or password is incorrect.");
     }
-    // Makes function untestable 
-    // const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
-    
-    const token = getNewToken(JWT_SECRET_KEY, user)
     const currentUser = {
         userId: user._id,
         name: user.name,
@@ -42,12 +41,13 @@ const loginUserWithUsername = async (payload) => {
         email: user.email,
         role: user.role
     }
+    const token = getNewToken(JWT_SECRET_KEY, currentUser);
     const response = { token, currentUser }
     return response;
 }
 
 const loginUserWithEmail = async (payload) => {
-    const { error } = loginEmailSchema.validate(payload)
+    const { error } = ValidationSchemas.loginEmailSchema.validate(payload)
     if (error) {
         throw error;
     }
@@ -55,9 +55,6 @@ const loginUserWithEmail = async (payload) => {
     if (!user) {
         throw Boom.badRequest("Email or password is incorrect.");
     }
-    // Makes function untestable 
-    // const token = jwt.sign(user.toJSON(), JWT_SECRET_KEY, { expiresIn: "1d" })
-
     const token = getNewToken(JWT_SECRET_KEY, user)
     const currentUser = {
         userId: user._id,
@@ -71,7 +68,7 @@ const loginUserWithEmail = async (payload) => {
 }
 
 const createUser = async (payload) => {
-    const { error } = createSchema.validate(payload, { allowUnknown: true });
+    const { error } = ValidationSchemas.createSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -84,7 +81,7 @@ const createUser = async (payload) => {
 }
 
 const resetPassword = async (payload) => {
-    const { error } = resetPasswordSchema.validate(payload, { allowUnknown: true });
+    const { error } = ValidationSchemas.resetPasswordSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -99,7 +96,7 @@ const resetPassword = async (payload) => {
 }
 
 const update = async (payload) => {
-    const { error } = updateSchema.validate(payload, { allowUnknown: true });
+    const { error } = ValidationSchemas.updateSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -113,7 +110,7 @@ const update = async (payload) => {
 }
 
 const remove = async (userId) => {
-    const { error } = removeSchema.validate({ userId }, { allowUnknown: true });
+    const { error } = ValidationSchemas.removeSchema.validate({ userId });
     if (error) {
         throw error;
     }
@@ -128,4 +125,25 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, remove }
+const generateManuscript = async (payload) => {
+    const { error } = ValidationSchemas.manuscriptSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    // upload file on cloud
+    // console.log(payload)
+    // Instantiate a storage client
+    const storage = new Storage({ keyFilename:  path.join(__dirname, "../../auth.json")});
+    
+    storage.getBuckets().then(x => console.log(x))
+
+    // store link in db
+
+    // delete file from server
+    const filePath = path.join(__dirname, `../assets/audio_files/${payload.file.filename}`);
+    fs.unlinkSync(filePath)
+
+    // return payload
+}
+
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, remove, generateManuscript }

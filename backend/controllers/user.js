@@ -111,4 +111,17 @@ const remove = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, remove }
+const generateManuscript = async (ctx) => {
+    const userId = ctx.params.userId
+    const file = ctx.req.file
+    const payload = { userId, file }
+    const response = await UserHandler.generateManuscript(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, remove, generateManuscript }

@@ -39,4 +39,9 @@ const removeSchema = Joi.object({
   userId: Joi.string().required()  
 })
 
-module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, removeSchema }
+const manuscriptSchema = Joi.object({
+  userId: Joi.string().required(),
+  file: Joi.object().required()
+})
+
+module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, removeSchema, manuscriptSchema }

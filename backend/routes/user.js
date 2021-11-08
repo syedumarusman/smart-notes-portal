@@ -8,16 +8,18 @@ const router = new Router({
 
 router.post("/login", controller.loginUser);
 
-router.get("/", controller.getAll);
+router.get("/", auth(["user", "admin"]), controller.getAll);
 
-router.get("/:userId", controller.getUser);
+router.get("/:userId", auth(["user", "admin"]), controller.getUser);
 
 router.post("/register", controller.registerUser);
 
-router.put("/:userId", controller.update);
+router.put("/:userId", auth(["user", "admin"]), controller.update);
 
-router.post("/resetPassword", controller.resetPassword);
+router.post("/resetPassword", auth(["user"]), controller.resetPassword);
 
 router.delete("/:userId", auth(["admin"]), controller.remove);
+
+router.post("/:userId/generateManuscript", auth(["user", "admin"]), controller.generateManuscript);
 
 module.exports = router.routes();

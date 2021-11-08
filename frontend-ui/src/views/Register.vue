@@ -107,8 +107,7 @@ export default {
     };
   },
   watch: {
-    errorType(newVal) {
-      console.log(newVal);
+    errorType() {
       setTimeout(() => {
         this.errorType = null;
       }, 4000);
