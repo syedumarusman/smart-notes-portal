@@ -16,6 +16,8 @@ router.post("/register", controller.registerUser);
 
 router.put("/:userId", auth(["user", "admin"]), controller.update);
 
+router.put("/addAudioLink", auth(["user", "admin"]), controller.addAudioLink)
+
 router.post("/resetPassword", auth(["user"]), controller.resetPassword);
 
 router.delete("/:userId", auth(["admin"]), controller.remove);

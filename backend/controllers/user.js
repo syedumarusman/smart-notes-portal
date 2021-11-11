@@ -87,6 +87,20 @@ const update = async (ctx) => {
     };
 }
 
+const addAudioLink = async (ctx) => {
+    const payload = {
+        userId: ctx.params.userId,
+        gcs_uri: ctx.params.gcs_uri,
+    }
+    const response = await UserHandler.addAudioLink(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
 const resetPassword = async (ctx) => {
     const payload = {
         email: ctx.request.body.email
@@ -124,4 +138,4 @@ const generateManuscript = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, remove, generateManuscript }
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, remove, generateManuscript }

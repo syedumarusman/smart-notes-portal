@@ -35,6 +35,11 @@ const updateSchema = Joi.object({
     email: Joi.string().email()
 })
 
+const addAudioLinkSchema = Joi.object({
+  userId: Joi.string(),
+  gcs_uri: Joi.string(),
+})
+
 const removeSchema = Joi.object({
   userId: Joi.string().required()  
 })
@@ -44,4 +49,4 @@ const manuscriptSchema = Joi.object({
   file: Joi.object().required()
 })
 
-module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, removeSchema, manuscriptSchema }
+module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, addAudioLinkSchema, removeSchema, manuscriptSchema }

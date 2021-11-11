@@ -112,6 +112,20 @@ const update = async (payload) => {
     return user;
 }
 
+const addAudioLink = async (payload) => {
+    const { error } = ValidationSchemas.addAudioLinkSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    const query = { _id: payload.userId };
+    const user = await User.findOne(query);
+    if (!user) {
+        throw Boom.notFound('User does not exist')
+    }
+    user = await User.findByIdAndUpdate( payload.userId , payload, { new: true });
+    return user;
+}
+
 const remove = async (userId) => {
     const { error } = ValidationSchemas.removeSchema.validate({ userId });
     if (error) {
@@ -166,4 +180,4 @@ const generateManuscript = async (payload) => {
     // return payload
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, remove, generateManuscript }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioLink, remove, generateManuscript }
