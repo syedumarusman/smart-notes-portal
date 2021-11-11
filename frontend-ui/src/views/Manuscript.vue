@@ -50,12 +50,12 @@ export default {
       }
     },
     async generateManuscript() {
+      console.log("inside generate manuscript");
       const response = await this.$store.dispatch(
         "generateManuscript",
         this.file
       );
       console.log(response);
-      console.log("inside generate manuscript");
     },
   },
 };

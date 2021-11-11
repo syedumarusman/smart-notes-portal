@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import HTTP from "../http-service";
+import { HTTP, HTTP_Flask } from "../http-service";
 import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
@@ -56,11 +56,10 @@ const store = new Vuex.Store({
     refreshToken: async (context, currentUser) => {
       return HTTP.post("/refreshToken", currentUser);
     },
-    generateManuscript: async ({ getters }, file) => {
-      const userId = getters.getCurrentUser.userId;
+    generateManuscript: async (context, file) => {
       let formData = new FormData();
       formData.append("file", file);
-      return HTTP.post(`user/${userId}/generateManuscript`, formData, {
+      return HTTP_Flask.post("/transcribe/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

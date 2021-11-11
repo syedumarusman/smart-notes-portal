@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # Backend files
 backend/assets/audio_files
+
+# Google credentials
+auth.json

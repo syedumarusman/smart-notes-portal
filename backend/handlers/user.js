@@ -1,12 +1,15 @@
 const Boom = require('boom');
 const User = require('../models/user');
-const { getNewToken } = require("../utils/jwtService")
+const { getNewToken } = require('../utils/jwtService');
 const { JWT_SECRET_KEY } = require('../utils/constants');
 const ValidationSchemas = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
 const { Storage } = require('@google-cloud/storage');
 const fs = require('fs');
 const path = require('path');
+var FormData = require('form-data');
+const { HTTP } = require('../utils/http-service');
+
 
 const getAll = async (queryPayload) => {
     Object.keys(queryPayload).forEach(key => queryPayload[key] === undefined ? delete queryPayload[key] : {});
@@ -130,17 +133,34 @@ const generateManuscript = async (payload) => {
     if (error) {
         throw error;
     }
-    // upload file on cloud
-    // console.log(payload)
+    // upload file on cloud and get speech to text results
+    const filePath = path.join(__dirname, `../assets/audio_files/${payload.file.filename}`);
+    console.log("inside generate manuscript", payload)
+    try{
+        let formData = new FormData();
+        formData.append("file", fs.createReadStream(filePath));
+        const manuscript = await HTTP.post("/transcribe/", {
+            headers: {
+            "Content-Type": "multipart/form-data",
+            formData: formData
+        },
+        }).catch((err) => {
+            console.log("err:", err)
+        });
+
+    } catch (err) {
+        console.log(err)
+    }
+
+
+
     // Instantiate a storage client
-    const storage = new Storage({ keyFilename:  path.join(__dirname, "../../auth.json")});
-    
-    storage.getBuckets().then(x => console.log(x))
+    // const storage = new Storage({ keyFilename:  path.join(__dirname, "../../auth.json")});    
 
     // store link in db
 
     // delete file from server
-    const filePath = path.join(__dirname, `../assets/audio_files/${payload.file.filename}`);
+    
     fs.unlinkSync(filePath)
 
     // return payload

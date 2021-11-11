@@ -32,4 +32,8 @@ HTTP.interceptors.response.use(
   }
 );
 
-export default HTTP;
+const HTTP_Flask = axios.create({
+  baseURL: `http://127.0.0.1:5000`,
+});
+
+export { HTTP, HTTP_Flask };
