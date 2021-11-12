@@ -5,7 +5,12 @@
       <div class="alert alert-danger" role="alert" v-if="invalidFileType">
         {{ invalidFileError }}
       </div>
-      <input type="file" id="file" v-on:change="handleFileUpload($event)" />
+      <input
+        type="file"
+        id="file"
+        ref="fileupload"
+        v-on:change="handleFileUpload($event)"
+      />
       <button
         class="btn btn-primary"
         id="generateManuscript"
@@ -19,6 +24,8 @@
 </template>
 
 <script>
+import jsPDF from "jspdf";
+
 export default {
   name: "Manuscript",
   data() {
@@ -43,19 +50,36 @@ export default {
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
-      if (file.type == "audio/wav") {
-        this.file = file;
-      } else {
-        this.invalidFileType = true;
+      if (file) {
+        if (file.type == "audio/wav") {
+          this.file = file;
+        } else {
+          this.invalidFileType = true;
+        }
       }
     },
     async generateManuscript() {
-      console.log("inside generate manuscript");
       const response = await this.$store.dispatch(
         "generateManuscript",
         this.file
       );
-      console.log(response);
+      const sentenceInfo = response.data.transcript;
+
+      let pdfName = this.file.name;
+      var doc = new jsPDF();
+      var lineNum = 20;
+
+      sentenceInfo.forEach((sentence, index) => {
+        const key = Object.keys(sentence)[0];
+        const speech = sentence[key];
+        const speakerSentence = `Sentence ${index + 1}: ${speech}`;
+        var splitText = doc.splitTextToSize(speakerSentence, 180);
+        doc.text(20, lineNum, splitText);
+        lineNum += 20;
+      });
+      doc.save(pdfName + ".pdf");
+      this.file = "";
+      this.$refs.fileupload.value = null;
     },
   },
 };

@@ -149,7 +149,6 @@ const generateManuscript = async (payload) => {
     }
     // upload file on cloud and get speech to text results
     const filePath = path.join(__dirname, `../assets/audio_files/${payload.file.filename}`);
-    console.log("inside generate manuscript", payload)
     try{
         let formData = new FormData();
         formData.append("file", fs.createReadStream(filePath));
