@@ -15,7 +15,10 @@ export default {
 
 <style lang="scss">
 .widget {
-  margin: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 25px;
+  margin-right: 25px;
   text-align: center;
 }
 .loader {
@@ -24,8 +27,8 @@ export default {
   margin: auto;
   border-radius: 50%;
   background: transparent;
-  border: 2px solid #ddd;
-  border-top: 5px solid #3490dc;
+  border: 1px solid #ddd;
+  border-top: 3px solid #3490dc;
 }
 
 @-webkit-keyframes spin {

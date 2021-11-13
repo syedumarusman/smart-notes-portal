@@ -16,8 +16,18 @@
         id="generateManuscript"
         :disabled="isDisabled"
         @click.prevent="generateManuscript"
+        v-if="!inProgress"
       >
         Generate
+      </button>
+      <button
+        class="btn btn-primary"
+        id="generateLoadingComponent"
+        disabled
+        @click.prevent="generateManuscript"
+        v-if="inProgress"
+      >
+        <LoadingComponent width="15"></LoadingComponent>
       </button>
     </div>
   </div>
@@ -28,6 +38,9 @@ import jsPDF from "jspdf";
 
 export default {
   name: "Manuscript",
+  components: {
+    LoadingComponent: () => import("../components/LoadingComponent.vue"),
+  },
   data() {
     return {
       file: "",
