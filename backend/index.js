@@ -14,6 +14,7 @@ app.use(cors());
 
 app.use(async function validationMiddleware(ctx, next) {
     try {
+        console.log(`${ctx.method} ${ctx.url}`);
         await next();
     } catch (err) {
         let status;

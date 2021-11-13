@@ -1,10 +1,10 @@
+const { ObjectId } = require('mongodb');
 const Boom = require('boom');
 const User = require('../models/user');
 const { getNewToken } = require('../utils/jwtService');
 const { JWT_SECRET_KEY } = require('../utils/constants');
 const ValidationSchemas = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
-const { Storage } = require('@google-cloud/storage');
 const fs = require('fs');
 const path = require('path');
 var FormData = require('form-data');
@@ -89,7 +89,7 @@ const resetPassword = async (payload) => {
         throw error;
     }
     const newPassword = Math.random().toString(36).substring(7);
-    const updatedUser = await User.findOneAndUpdate(payload, {$set: {password: newPassword} }, 
+    const updatedUser = await User.findOneAndUpdate(payload, { $set: { password: newPassword } }, 
         { useFindAndModify: false, new: true });
     if (!updatedUser) {
         throw Boom.notFound('User does not exist');
@@ -117,13 +117,14 @@ const addAudioLink = async (payload) => {
     if (error) {
         throw error;
     }
-    const query = { _id: payload.userId };
+    const userId = ObjectId(payload.userId);
+    const query = { _id: userId };
     const user = await User.findOne(query);
     if (!user) {
         throw Boom.notFound('User does not exist')
     }
-    user = await User.findByIdAndUpdate( payload.userId , payload, { new: true });
-    return user;
+    updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: payload.gcs_uri  } }, { new: true });
+    return updatedUser;
 }
 
 const remove = async (userId) => {
@@ -142,41 +143,4 @@ const remove = async (userId) => {
     return response;
 }
 
-const generateManuscript = async (payload) => {
-    const { error } = ValidationSchemas.manuscriptSchema.validate(payload);
-    if (error) {
-        throw error;
-    }
-    // upload file on cloud and get speech to text results
-    const filePath = path.join(__dirname, `../assets/audio_files/${payload.file.filename}`);
-    try{
-        let formData = new FormData();
-        formData.append("file", fs.createReadStream(filePath));
-        const manuscript = await HTTP.post("/transcribe/", {
-            headers: {
-            "Content-Type": "multipart/form-data",
-            formData: formData
-        },
-        }).catch((err) => {
-            console.log("err:", err)
-        });
-
-    } catch (err) {
-        console.log(err)
-    }
-
-
-
-    // Instantiate a storage client
-    // const storage = new Storage({ keyFilename:  path.join(__dirname, "../../auth.json")});    
-
-    // store link in db
-
-    // delete file from server
-    
-    fs.unlinkSync(filePath)
-
-    // return payload
-}
-
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioLink, remove, generateManuscript }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioLink, remove }

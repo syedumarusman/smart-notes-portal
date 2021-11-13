@@ -65,6 +65,11 @@ const store = new Vuex.Store({
         },
       });
     },
+    addAudioFile: async ({ getters }, audioLink) => {
+      return HTTP.patch(`user/${getters.getCurrentUser.userId}/addAudioLink`, {
+        gcs_uri: audioLink,
+      });
+    },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");
       commit("SET_CURRENT_USER", {});

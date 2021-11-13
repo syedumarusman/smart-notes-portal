@@ -90,7 +90,7 @@ const update = async (ctx) => {
 const addAudioLink = async (ctx) => {
     const payload = {
         userId: ctx.params.userId,
-        gcs_uri: ctx.params.gcs_uri,
+        gcs_uri: ctx.request.body.gcs_uri,
     }
     const response = await UserHandler.addAudioLink(payload);
     ctx.body = {
@@ -125,17 +125,4 @@ const remove = async (ctx) => {
     };
 }
 
-const generateManuscript = async (ctx) => {
-    const userId = ctx.params.userId
-    const file = ctx.req.file
-    const payload = { userId, file }
-    const response = await UserHandler.generateManuscript(payload);
-    ctx.body = {
-        meta: {
-            status: 200
-        },
-        data: response
-    };
-}
-
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, remove, generateManuscript }
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, remove }

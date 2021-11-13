@@ -16,12 +16,10 @@ router.post("/register", controller.registerUser);
 
 router.put("/:userId", auth(["user", "admin"]), controller.update);
 
-router.put("/addAudioLink", auth(["user", "admin"]), controller.addAudioLink)
+router.patch("/:userId/addAudioLink", auth(["user", "admin"]), controller.addAudioLink)
 
 router.post("/resetPassword", auth(["user"]), controller.resetPassword);
 
 router.delete("/:userId", auth(["admin"]), controller.remove);
-
-router.post("/:userId/generateManuscript", auth(["user", "admin"]), controller.generateManuscript);
 
 module.exports = router.routes();

@@ -14,7 +14,7 @@
       <button
         class="btn btn-primary"
         id="generateManuscript"
-        :disabled="!isDisabled"
+        :disabled="isDisabled"
         @click.prevent="generateManuscript"
       >
         Generate
@@ -32,12 +32,13 @@ export default {
     return {
       file: "",
       invalidFileType: false,
+      inProgress: false,
       invalidFileError: "Invalid file type. Please upload a wav file!",
     };
   },
   computed: {
     isDisabled() {
-      return typeof this.file == "object";
+      return typeof this.file !== "object" || this.inProgress;
     },
   },
   watch: {
@@ -59,12 +60,14 @@ export default {
       }
     },
     async generateManuscript() {
+      this.inProgress = true;
       const response = await this.$store.dispatch(
         "generateManuscript",
         this.file
       );
       const sentenceInfo = response.data.transcript;
 
+      // export api response into a pdf file
       let pdfName = this.file.name;
       var doc = new jsPDF();
       var lineNum = 20;
@@ -80,6 +83,11 @@ export default {
       doc.save(pdfName + ".pdf");
       this.file = "";
       this.$refs.fileupload.value = null;
+      this.inProgress = false;
+
+      // add audio link to user's document in the database
+      const audioLink = response.data.gcs_uri;
+      await this.$store.dispatch("addAudioFile", audioLink);
     },
   },
 };
