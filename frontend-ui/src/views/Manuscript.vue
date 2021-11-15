@@ -1,34 +1,49 @@
 <template>
   <div class="row">
     <div class="col">
-      <h2>Manuscript</h2>
+      <h2><strong>Convert Your Audio Into Text Manuscript</strong></h2>
+      <br />
       <div class="alert alert-danger" role="alert" v-if="invalidFileType">
         {{ invalidFileError }}
       </div>
-      <input
-        type="file"
-        id="file"
-        ref="fileupload"
-        v-on:change="handleFileUpload($event)"
-      />
-      <button
-        class="btn btn-primary"
-        id="generateManuscript"
-        :disabled="isDisabled"
-        @click.prevent="generateManuscript"
-        v-if="!inProgress"
-      >
-        Generate
-      </button>
-      <button
-        class="btn btn-primary"
-        id="generateLoadingComponent"
-        disabled
-        @click.prevent="generateManuscript"
-        v-if="inProgress"
-      >
-        <LoadingComponent width="15"></LoadingComponent>
-      </button>
+      <div class="row-style">
+        <input
+          type="file"
+          id="file"
+          ref="fileupload"
+          v-on:change="handleFileUpload($event)"
+        />
+        <input
+          type="text"
+          id="fileDescription"
+          class="form-control me-3"
+          placeholder="Description"
+          v-model="description"
+          required
+          autofocus
+        />
+        <button
+          class="btn btn-primary"
+          id="generateManuscript"
+          :disabled="isDisabled"
+          @click.prevent="generateManuscript"
+          v-if="!inProgress"
+        >
+          Generate
+        </button>
+        <button
+          class="btn btn-primary"
+          id="generateLoadingComponent"
+          disabled
+          @click.prevent="generateManuscript"
+          v-if="inProgress"
+        >
+          <LoadingComponent width="15"></LoadingComponent>
+        </button>
+      </div>
+      <br />
+      <br />
+      <HistoryTable />
     </div>
   </div>
 </template>
@@ -40,10 +55,15 @@ export default {
   name: "Manuscript",
   components: {
     LoadingComponent: () => import("../components/LoadingComponent.vue"),
+    HistoryTable: () => import("../components/HistoryTable.vue"),
+  },
+  async mounted() {
+    await this.getManuscriptHistory();
   },
   data() {
     return {
       file: "",
+      description: "",
       invalidFileType: false,
       inProgress: false,
       invalidFileError: "Invalid file type. Please upload a wav file!",
@@ -62,6 +82,9 @@ export default {
     },
   },
   methods: {
+    async getManuscriptHistory() {
+      console.log("get manuscript list");
+    },
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -79,12 +102,10 @@ export default {
         this.file
       );
       const sentenceInfo = response.data.transcript;
-
       // export api response into a pdf file
       let pdfName = this.file.name;
       var doc = new jsPDF();
       var lineNum = 20;
-
       sentenceInfo.forEach((sentence, index) => {
         const key = Object.keys(sentence)[0];
         const speech = sentence[key];
@@ -106,4 +127,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.row-style {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
