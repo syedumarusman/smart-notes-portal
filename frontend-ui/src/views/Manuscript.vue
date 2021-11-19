@@ -6,13 +6,13 @@
       <div class="alert alert-danger" role="alert" v-if="invalidFileType">
         {{ invalidFileError }}
       </div>
-      <div>
+      <!-- <div>
         <b-button v-b-modal.modal-1>Show Modal</b-button>
 
         <b-modal id="modal-1" title="Vue Js Bootstrap Modal Example">
           <p class="my-4">Content goes here...</p>
         </b-modal>
-      </div>
+      </div> -->
       <div class="row-style">
         <input
           type="file"
@@ -62,7 +62,7 @@ export default {
   name: "Manuscript",
   components: {
     LoadingComponent: () => import("../components/LoadingComponent.vue"),
-    HistoryTable: () => import("../components/HistoryTable.vue"),
+    HistoryTable: () => import("../components/HistoryTableManuscript.vue"),
   },
   async mounted() {
     await this.getManuscriptHistory();

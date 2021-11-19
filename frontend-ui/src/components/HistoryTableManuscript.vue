@@ -10,8 +10,8 @@
 <script>
 export default {
   components: {
-    TableHead: () => import("../components/TableHead.vue"),
-    TableRow: () => import("../components/TableRow.vue"),
+    TableHead: () => import("./TableHead.vue"),
+    TableRow: () => import("./TableRow.vue"),
   },
   data() {
     return {
