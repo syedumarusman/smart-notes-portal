@@ -5,11 +5,7 @@ const { getNewToken } = require('../utils/jwtService');
 const { JWT_SECRET_KEY } = require('../utils/constants');
 const ValidationSchemas = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
-const fs = require('fs');
-const path = require('path');
-var FormData = require('form-data');
 const { HTTP } = require('../utils/http-service');
-
 
 const getAll = async (queryPayload) => {
     Object.keys(queryPayload).forEach(key => queryPayload[key] === undefined ? delete queryPayload[key] : {});
@@ -112,8 +108,8 @@ const update = async (payload) => {
     return user;
 }
 
-const addAudioLink = async (payload) => {
-    const { error } = ValidationSchemas.addAudioLinkSchema.validate(payload);
+const addAudioFile = async (payload) => {
+    const { error } = ValidationSchemas.audioFileSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -123,7 +119,11 @@ const addAudioLink = async (payload) => {
     if (!user) {
         throw Boom.notFound('User does not exist')
     }
-    updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: payload.gcs_uri  } }, { new: true });
+    const { description, gcs_uri, created } = payload;
+    const audioFile = { description, gcs_uri, created };
+    console.log(payload, "\n")
+    console.log(audioFile)
+    updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: audioFile  } }, { new: true });
     return updatedUser;
 }
 
@@ -143,4 +143,4 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioLink, remove }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, remove }

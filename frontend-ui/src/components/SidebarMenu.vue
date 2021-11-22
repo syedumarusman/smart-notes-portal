@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="py-4 px-3 mb-4 bg-light">
+  <div class="container-fluid">
+    <div class="py-4 px-3 bg-light">
       <div class="media d-flex">
         <img
           src="https://therichpost.com/wp-content/uploads/2020/06/avatar2.png"
@@ -22,7 +22,9 @@
         <a
           class="nav-link"
           :class="[
-            focusDashboard ? 'active selected' : 'text-secondary set-cursor',
+            focusDashboard
+              ? 'selected bg-secondary'
+              : 'text-secondary set-cursor',
           ]"
           @click="setFocus(DASHBOARD)"
         >
@@ -36,7 +38,9 @@
         <a
           class="nav-link"
           :class="[
-            focusManuscript ? 'active selected' : 'text-secondary set-cursor',
+            focusManuscript
+              ? 'selected bg-secondary'
+              : 'text-secondary set-cursor',
           ]"
           @click="setFocus(MANUSCRIPT)"
         >
@@ -50,7 +54,9 @@
         <a
           class="nav-link"
           :class="[
-            focusSummary ? 'active selected' : 'text-secondary set-cursor',
+            focusSummary
+              ? 'selected bg-secondary'
+              : 'text-secondary set-cursor',
           ]"
           @click="setFocus(SUMMARY)"
         >
@@ -64,7 +70,9 @@
         <a
           class="nav-link"
           :class="[
-            focusFeedback ? 'active selected' : 'text-secondary set-cursor',
+            focusFeedback
+              ? 'selected bg-secondary'
+              : 'text-secondary set-cursor',
           ]"
           @click="setFocus(FEEDBACK)"
         >
@@ -134,6 +142,7 @@ export default {
 <style>
 .selected {
   pointer-events: none;
+  color: white;
   cursor: default;
 }
 .set-cursor {

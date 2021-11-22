@@ -6,7 +6,8 @@
           <div class="card-block">
             <h3 class="m-b-20">Manuscript Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-earmark-text f-left"></i><span>6</span>
+              <i class="bi bi-file-earmark-text f-left"></i>
+              <p class="f-right">6</p>
             </h1>
           </div>
         </div>
@@ -17,7 +18,8 @@
           <div class="card-block">
             <h3 class="m-b-20">Summary Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-text f-left"></i><span>4</span>
+              <i class="bi bi-file-text f-left"></i>
+              <p class="f-right">4</p>
             </h1>
           </div>
         </div>
@@ -30,7 +32,8 @@
           <div class="card-block">
             <h3 class="m-b-20">Audio Uploads</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-earmark-music f-left"></i><span>10</span>
+              <i class="bi bi-file-earmark-music f-left"></i>
+              <p class="f-right">10</p>
             </h1>
           </div>
         </div>

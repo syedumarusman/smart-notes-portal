@@ -16,7 +16,7 @@ router.post("/register", controller.registerUser);
 
 router.put("/:userId", auth(["user", "admin"]), controller.update);
 
-router.patch("/:userId/addAudioLink", auth(["user", "admin"]), controller.addAudioLink)
+router.patch("/:userId/addAudioDetails", auth(["user", "admin"]), controller.addAudioLink)
 
 router.post("/resetPassword", auth(["user"]), controller.resetPassword);
 

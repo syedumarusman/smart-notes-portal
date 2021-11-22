@@ -50,7 +50,7 @@
       </div>
       <br />
       <br />
-      <HistoryTable />
+      <b-table />
     </div>
   </div>
 </template>
@@ -62,9 +62,8 @@ export default {
   name: "Summary",
   components: {
     LoadingComponent: () => import("../components/LoadingComponent.vue"),
-    HistoryTable: () => import("../components/HistoryTableSummary.vue"),
   },
-  async mounted() {
+  async created() {
     await this.getSummaryHistory();
   },
   data() {

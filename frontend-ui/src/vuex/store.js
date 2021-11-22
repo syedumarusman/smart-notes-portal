@@ -65,10 +65,14 @@ const store = new Vuex.Store({
         },
       });
     },
-    addAudioFile: async ({ getters }, audioLink) => {
-      return HTTP.patch(`user/${getters.getCurrentUser.userId}/addAudioLink`, {
-        gcs_uri: audioLink,
-      });
+    getManuscriptList: ({ getters }) => {
+      return HTTP.get(`user/${getters.getCurrentUser.userId}`);
+    },
+    addAudioFile: async ({ getters }, payload) => {
+      return HTTP.patch(
+        `user/${getters.getCurrentUser.userId}/addAudioDetails`,
+        payload
+      );
     },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");

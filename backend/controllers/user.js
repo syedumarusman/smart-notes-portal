@@ -90,9 +90,11 @@ const update = async (ctx) => {
 const addAudioLink = async (ctx) => {
     const payload = {
         userId: ctx.params.userId,
+        description: ctx.request.body.description,
         gcs_uri: ctx.request.body.gcs_uri,
+        created: ctx.request.body.created
     }
-    const response = await UserHandler.addAudioLink(payload);
+    const response = await UserHandler.addAudioFile(payload);
     ctx.body = {
         meta: {
             status: 200
