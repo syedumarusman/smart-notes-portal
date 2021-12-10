@@ -103,6 +103,22 @@ const addAudioLink = async (ctx) => {
     };
 }
 
+const removeAudioLink = async (ctx) => {
+    const payload = {
+        userId: ctx.params.userId,
+        description: ctx.request.body.description,
+        gcs_uri: ctx.request.body.gcs_uri,
+        created: ctx.request.body.created
+    }
+    const response = await UserHandler.removeAudioFile(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
 const resetPassword = async (ctx) => {
     const payload = {
         email: ctx.request.body.email
@@ -127,4 +143,4 @@ const remove = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, remove }
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, removeAudioLink, remove }

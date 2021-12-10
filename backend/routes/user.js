@@ -18,6 +18,8 @@ router.put("/:userId", auth(["user", "admin"]), controller.update);
 
 router.patch("/:userId/addAudioDetails", auth(["user", "admin"]), controller.addAudioLink)
 
+router.patch("/:userId/removeAudioDetails", auth(["user", "admin"]), controller.removeAudioLink)
+
 router.post("/resetPassword", auth(["user"]), controller.resetPassword);
 
 router.delete("/:userId", auth(["admin"]), controller.remove);

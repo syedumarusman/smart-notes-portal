@@ -121,9 +121,26 @@ const addAudioFile = async (payload) => {
     }
     const { description, gcs_uri, created } = payload;
     const audioFile = { description, gcs_uri, created };
-    console.log(payload, "\n")
-    console.log(audioFile)
     updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: audioFile  } }, { new: true });
+    return updatedUser;
+}
+
+const removeAudioFile = async (payload) => {
+    const { error } = ValidationSchemas.audioFileSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    const userId = ObjectId(payload.userId);
+    const query = { _id: userId };
+    const user = await User.findOne(query);
+    if (!user) {
+        throw Boom.notFound('User does not exist')
+    }
+    const { description, gcs_uri, created } = payload;
+    const audioFile = { description, gcs_uri, created };
+    console.log("audioFile: ", audioFile);
+    updatedUser = await User.findByIdAndUpdate( userId, {$pull: { audioFiles: audioFile } }, { new: true });
+    console.log(updatedUser);
     return updatedUser;
 }
 
@@ -143,4 +160,4 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, remove }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, removeAudioFile, remove }
