@@ -10,6 +10,7 @@ const store = new Vuex.Store({
     auth_status: false,
     token: "",
     currentUser: {},
+    audioText: [""],
   },
   mutations: {
     SET_AUTH_STATUS: (state, auth_status) => {
@@ -20,6 +21,9 @@ const store = new Vuex.Store({
     },
     SET_CURRENT_USER: (state, user) => {
       state.currentUser = user;
+    },
+    SET_AUDIO_TEXT: (state, text) => {
+      state.audioText.push(text);
     },
   },
   actions: {
@@ -68,9 +72,17 @@ const store = new Vuex.Store({
     getManuscriptList: ({ getters }) => {
       return HTTP.get(`user/${getters.getCurrentUser.userId}`);
     },
-    addAudioFile: async ({ getters }, payload) => {
+    addAudioFile: async ({ commit, getters }, payload) => {
+      commit("SET_AUDIO_TEXT", payload.docText);
+      delete payload.docText; // Removes PDF document from payload before updating audios
       return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/addAudioDetails`,
+        payload
+      );
+    },
+    removeAudioFile: async ({ getters }, payload) => {
+      return HTTP.patch(
+        `user/${getters.getCurrentUser.userId}/removeAudioDetails`,
         payload
       );
     },
@@ -89,6 +101,9 @@ const store = new Vuex.Store({
     },
     getCurrentUser(state) {
       return state.currentUser;
+    },
+    getAudioText(state) {
+      return state.audioText;
     },
   },
   plugins: [

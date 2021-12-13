@@ -138,9 +138,7 @@ const removeAudioFile = async (payload) => {
     }
     const { description, gcs_uri, created } = payload;
     const audioFile = { description, gcs_uri, created };
-    console.log("audioFile: ", audioFile);
     updatedUser = await User.findByIdAndUpdate( userId, {$pull: { audioFiles: audioFile } }, { new: true });
-    console.log(updatedUser);
     return updatedUser;
 }
 
