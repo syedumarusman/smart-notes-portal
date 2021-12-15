@@ -29,14 +29,14 @@ const store = new Vuex.Store({
       state.audioText.push(subList);
     },
     REMOVE_AUDIO_TEXT: (state, _id) => {
-      state.audioText = state.audioText.filter((items) => items[0] === _id);
+      state.audioText = state.audioText.filter((items) => items[0] !== _id);
     },
     SET_SUMMARY_TEXT: (state, payload) => {
       const subList = [payload._id, payload.text];
       state.summaryText.push(subList);
     },
     REMOVE_SUMMARY_TEXT: (state, _id) => {
-      state.summaryText = state.summaryText.filter((items) => items[0] === _id);
+      state.summaryText = state.summaryText.filter((items) => items[0] !== _id);
     },
     SET_CURRENT_TAB: (state, currentTab) => {
       state.currentTab = currentTab;
@@ -168,10 +168,19 @@ const store = new Vuex.Store({
     getCurrentTab(state) {
       return state.currentTab;
     },
+    getAudioTextCount(state) {
+      return state.audioText.length;
+    },
+    getSummaryTextCount(state) {
+      return state.summaryText.length;
+    },
+    getTotalGenerations(state) {
+      return state.audioText.length + state.summaryText.length;
+    },
   },
   plugins: [
     createPersistedState({
-      storage: window.sessionStorage,
+      storage: window.localStorage,
     }),
   ],
 });

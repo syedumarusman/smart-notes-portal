@@ -30,7 +30,9 @@
           variant="none"
           class="me-3 customDropdown"
         >
-          <b-dropdown-item disabled>Please select one</b-dropdown-item>
+          <b-dropdown-item @click="selected = 'Please select one'"
+            >Please select one</b-dropdown-item
+          >
           <b-dropdown-item @click="selected = '5'">5</b-dropdown-item>
           <b-dropdown-item @click="selected = '10'">10</b-dropdown-item>
           <b-dropdown-item @click="selected = '20'">20</b-dropdown-item>
@@ -81,6 +83,7 @@
     <b-table
       :fields="headings"
       :items="summaryHistory"
+      hover
       head-variant="dark"
       v-if="summaryHistory.length"
     >
@@ -232,7 +235,7 @@ export default {
         .text("Summary", 90, 10)
         .setFont(undefined, "normal");
       const currentSummaryList = this.$store.getters.getSummaryText;
-      const subList = currentSummaryList.find((list) => list[0] !== _id);
+      const subList = currentSummaryList.find((list) => list[0] === _id);
       let splitText = doc.splitTextToSize(subList[1], 180);
       doc.text(20, lineNum, splitText);
       const pdfName = row.item.summary_file.split("/").slice(-1)[0];

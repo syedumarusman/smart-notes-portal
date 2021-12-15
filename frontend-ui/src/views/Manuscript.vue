@@ -32,7 +32,9 @@
           variant="none"
           class="me-3 customDropdown"
         >
-          <b-dropdown-item disabled>Please select one</b-dropdown-item>
+          <b-dropdown-item @click="selected = 'Please select one'"
+            >Please select one</b-dropdown-item
+          >
           <b-dropdown-item @click="selected = '1'">1</b-dropdown-item>
           <b-dropdown-item @click="selected = '2'">2</b-dropdown-item>
           <b-dropdown-item @click="selected = '3'">3</b-dropdown-item>
@@ -232,7 +234,7 @@ export default {
         .text("Manuscript", 90, 10)
         .setFont(undefined, "normal");
       const currentAudioList = this.$store.getters.getAudioText;
-      const subList = currentAudioList.find((list) => list[0] !== _id);
+      const subList = currentAudioList.find((list) => list[0] === _id);
       let splitText = doc.splitTextToSize(subList[1], 180);
       doc.text(20, lineNum, splitText);
       const pdfName = row.item.audio_file.split("/").slice(-1)[0];
@@ -272,11 +274,11 @@ export default {
         const speakerSentence = `${speaker[0]} ${speaker[1]}: ${speech}`;
         var splitText = doc.splitTextToSize(speakerSentence, 180);
         docText += splitText + "\n";
-        console.log("DocText Length: ", docText.length);
         doc.text(20, lineNum, splitText);
-        if (docText.length >= 800) lineNum += 55;
-        else if (docText.length >= 400) lineNum += 35;
-        else if (docText.length >= 200) lineNum += 20;
+        if (docText.length >= 800) lineNum += 50;
+        else if (docText.length >= 400) lineNum += 40;
+        else if (docText.length >= 200) lineNum += 30;
+        else lineNum += 20;
       });
       doc.save(pdfName + ".pdf");
       this.$refs.fileupload.value = null;

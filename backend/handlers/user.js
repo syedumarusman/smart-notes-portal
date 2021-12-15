@@ -121,9 +121,13 @@ const addSummaryFile = async (payload) => {
     }
     
     const { description, gcs_uri, created } = payload;
-    const summaryFile = { description, gcs_uri, created };
-    updatedUser = await User.findByIdAndUpdate( userId, { $push: { summaryFiles: summaryFile  } }, { new: true });
-    return updatedUser;
+    const summaryFile = { _id:ObjectId(), description, gcs_uri, created };
+    user.summaryFiles.push(summaryFile);
+    await user.save();
+    const response = {
+        _id: summaryFile._id
+    }
+    return response;
 }
 
 const addAudioFile = async (payload) => {
@@ -138,16 +142,13 @@ const addAudioFile = async (payload) => {
         throw Boom.notFound('User does not exist')
     }
     const { description, gcs_uri, created } = payload;
-    try{
-        const newAudioFile = FileSchema({description, gcs_uri, created});
-        console.log("newAudioFile: ", newAudioFile);
-    } catch(err) {
-        console.log(err);
+    const audioFile = { _id:ObjectId(), description, gcs_uri, created };
+    user.audioFiles.push(audioFile);
+    await user.save();
+    const response = {
+        _id: audioFile._id
     }
-
-    // const audioFile = { description, gcs_uri, created };
-    // updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: audioFile  } }, { new: true });
-    // return updatedUser;
+    return response;
 }
 
 const removeSummaryFile = async (payload) => {

@@ -6,8 +6,11 @@
           <div class="card-block">
             <h3 class="m-b-20">Manuscript Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-earmark-text f-left"></i>
-              <p class="f-right">6</p>
+              <p class="f-right">
+                <b-icon icon="file-earmark-text"></b-icon>&nbsp;{{
+                  this.getAudioTextCount
+                }}
+              </p>
             </h1>
           </div>
         </div>
@@ -18,8 +21,11 @@
           <div class="card-block">
             <h3 class="m-b-20">Summary Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-text f-left"></i>
-              <p class="f-right">4</p>
+              <p class="f-right">
+                <b-icon icon="file-text"></b-icon>&nbsp;{{
+                  this.getSummaryTextCount
+                }}
+              </p>
             </h1>
           </div>
         </div>
@@ -30,10 +36,13 @@
       <div class="col">
         <div class="card bg-c-yellow order-card">
           <div class="card-block">
-            <h3 class="m-b-20">Audio Uploads</h3>
+            <h3 class="m-b-20">Total Generations</h3>
             <h1 class="text-right">
-              <i class="bi bi-file-earmark-music f-left"></i>
-              <p class="f-right">10</p>
+              <p class="f-right">
+                <b-icon icon="layers"></b-icon>&nbsp;{{
+                  this.getTotalGenerations
+                }}
+              </p>
             </h1>
           </div>
         </div>
@@ -43,8 +52,20 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "Dashboard",
+  data() {
+    return {};
+  },
+  computed: {
+    ...mapGetters([
+      "getAudioTextCount",
+      "getSummaryTextCount",
+      "getTotalGenerations",
+    ]),
+  },
+  methods: {},
 };
 </script>
 
@@ -82,10 +103,6 @@ export default {
 .card .card-block {
   padding: 25px;
 }
-
-/* .order-card i {
-  font-size: 26px;
-} */
 
 .f-left {
   float: left;
