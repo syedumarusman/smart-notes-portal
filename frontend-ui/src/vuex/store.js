@@ -10,7 +10,9 @@ const store = new Vuex.Store({
     auth_status: false,
     token: "",
     currentUser: {},
-    audioText: [""],
+    audioText: [],
+    summaryText: [],
+    currentTab: "",
   },
   mutations: {
     SET_AUTH_STATUS: (state, auth_status) => {
@@ -22,8 +24,22 @@ const store = new Vuex.Store({
     SET_CURRENT_USER: (state, user) => {
       state.currentUser = user;
     },
-    SET_AUDIO_TEXT: (state, text) => {
-      state.audioText.push(text);
+    SET_AUDIO_TEXT: (state, payload) => {
+      const subList = [payload._id, payload.text];
+      state.audioText.push(subList);
+    },
+    REMOVE_AUDIO_TEXT: (state, _id) => {
+      state.audioText = state.audioText.filter((items) => items[0] === _id);
+    },
+    SET_SUMMARY_TEXT: (state, payload) => {
+      const subList = [payload._id, payload.text];
+      state.summaryText.push(subList);
+    },
+    REMOVE_SUMMARY_TEXT: (state, _id) => {
+      state.summaryText = state.summaryText.filter((items) => items[0] === _id);
+    },
+    SET_CURRENT_TAB: (state, currentTab) => {
+      state.currentTab = currentTab;
     },
   },
   actions: {
@@ -42,6 +58,7 @@ const store = new Vuex.Store({
           commit("SET_TOKEN", token);
           commit("SET_CURRENT_USER", currentUser);
           commit("SET_AUTH_STATUS", true);
+          commit("SET_CURRENT_TAB", "dashboard");
         }
       });
     },
@@ -49,6 +66,10 @@ const store = new Vuex.Store({
       return HTTP.post("user/register", information);
     },
     verifyToken: async ({ state, dispatch }) => {
+      if (state.token.length === 0) {
+        dispatch("logout");
+        return;
+      }
       return HTTP.get("/checkAuthToken", {
         params: { token: state.token },
       }).then(({ data }) => {
@@ -60,27 +81,62 @@ const store = new Vuex.Store({
     refreshToken: async (context, currentUser) => {
       return HTTP.post("/refreshToken", currentUser);
     },
-    generateManuscript: async (context, file) => {
+    generateManuscript: async (context, payload) => {
       let formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", payload.file);
+      if (payload.speakerCount)
+        formData.append("speakerCount", payload.speakerCount);
       return HTTP_Flask.post("/transcribe/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
     },
-    getManuscriptList: ({ getters }) => {
+    getUserDetails: ({ getters }) => {
       return HTTP.get(`user/${getters.getCurrentUser.userId}`);
     },
-    addAudioFile: async ({ commit, getters }, payload) => {
-      commit("SET_AUDIO_TEXT", payload.docText);
-      delete payload.docText; // Removes PDF document from payload before updating audios
+    generateSummary: async (context, payload) => {
+      let formData = new FormData();
+      formData.append("file", payload.file);
+      if (payload.sentenceCount)
+        formData.append("sentenceCount", payload.sentenceCount);
+      return HTTP_Flask.post("/summarize/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    },
+    addSummaryFile: async ({ commit, getters }, payload) => {
+      const text = payload.text;
+      delete payload.text;
+      const response = await HTTP.patch(
+        `user/${getters.getCurrentUser.userId}/addSummaryDetails`,
+        payload
+      );
+      const _id = response.data.data._id;
+      const data = { _id, text };
+      commit("SET_SUMMARY_TEXT", data);
+    },
+    removeSummaryFile: async ({ getters, commit }, payload) => {
+      commit("REMOVE_SUMMARY_TEXT", payload._id);
       return HTTP.patch(
-        `user/${getters.getCurrentUser.userId}/addAudioDetails`,
+        `user/${getters.getCurrentUser.userId}/removeSummaryDetails`,
         payload
       );
     },
-    removeAudioFile: async ({ getters }, payload) => {
+    addAudioFile: async ({ commit, getters }, payload) => {
+      const text = payload.docText;
+      delete payload.docText; // Removes PDF document from payload before updating audios
+      const response = await HTTP.patch(
+        `user/${getters.getCurrentUser.userId}/addAudioDetails`,
+        payload
+      );
+      const _id = response.data.data._id;
+      const data = { _id, text };
+      commit("SET_AUDIO_TEXT", data);
+    },
+    removeAudioFile: async ({ getters, commit }, payload) => {
+      commit("REMOVE_AUDIO_TEXT", payload._id);
       return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/removeAudioDetails`,
         payload
@@ -90,6 +146,7 @@ const store = new Vuex.Store({
       commit("SET_TOKEN", "");
       commit("SET_CURRENT_USER", {});
       commit("SET_AUTH_STATUS", false);
+      commit("SET_CURRENT_TAB", "dashboard");
     },
   },
   getters: {
@@ -104,6 +161,12 @@ const store = new Vuex.Store({
     },
     getAudioText(state) {
       return state.audioText;
+    },
+    getSummaryText(state) {
+      return state.summaryText;
+    },
+    getCurrentTab(state) {
+      return state.currentTab;
     },
   },
   plugins: [

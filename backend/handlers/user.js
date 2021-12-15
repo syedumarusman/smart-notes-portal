@@ -1,11 +1,11 @@
 const { ObjectId } = require('mongodb');
 const Boom = require('boom');
-const User = require('../models/user');
+const { User, FileSchema } = require('../models/user');
 const { getNewToken } = require('../utils/jwtService');
 const { JWT_SECRET_KEY } = require('../utils/constants');
 const ValidationSchemas = require('../validations/userSchema');
 const sendEmail = require('../utils/email');
-const { HTTP } = require('../utils/http-service');
+const { deleteFile } = require("../utils/cloudServices");
 
 const getAll = async (queryPayload) => {
     Object.keys(queryPayload).forEach(key => queryPayload[key] === undefined ? delete queryPayload[key] : {});
@@ -108,8 +108,26 @@ const update = async (payload) => {
     return user;
 }
 
+const addSummaryFile = async (payload) => {
+    const { error } = ValidationSchemas.FileSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    const userId = ObjectId(payload.userId);
+    const query = { _id: userId };
+    const user = await User.findOne(query);
+    if (!user) {
+        throw Boom.notFound('User does not exist')
+    }
+    
+    const { description, gcs_uri, created } = payload;
+    const summaryFile = { description, gcs_uri, created };
+    updatedUser = await User.findByIdAndUpdate( userId, { $push: { summaryFiles: summaryFile  } }, { new: true });
+    return updatedUser;
+}
+
 const addAudioFile = async (payload) => {
-    const { error } = ValidationSchemas.audioFileSchema.validate(payload);
+    const { error } = ValidationSchemas.FileSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -120,13 +138,39 @@ const addAudioFile = async (payload) => {
         throw Boom.notFound('User does not exist')
     }
     const { description, gcs_uri, created } = payload;
-    const audioFile = { description, gcs_uri, created };
-    updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: audioFile  } }, { new: true });
+    try{
+        const newAudioFile = FileSchema({description, gcs_uri, created});
+        console.log("newAudioFile: ", newAudioFile);
+    } catch(err) {
+        console.log(err);
+    }
+
+    // const audioFile = { description, gcs_uri, created };
+    // updatedUser = await User.findByIdAndUpdate( userId, { $push: { audioFiles: audioFile  } }, { new: true });
+    // return updatedUser;
+}
+
+const removeSummaryFile = async (payload) => {
+    const { error } = ValidationSchemas.removeFileSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    const userId = ObjectId(payload.userId);
+    const query = { _id: userId };
+    const user = await User.findOne(query);
+    if (!user) {
+        throw Boom.notFound('User does not exist')
+    }
+    const bucketName = "capstone-summaries"
+    const fileName = payload.gcs_uri.split("/").slice(-1)[0];    
+    await deleteFile(bucketName, fileName);
+    updatedUser = await User.findByIdAndUpdate( userId, {
+        $pull: { summaryFiles: { _id: payload._id } } }, { new: true });
     return updatedUser;
 }
 
 const removeAudioFile = async (payload) => {
-    const { error } = ValidationSchemas.audioFileSchema.validate(payload);
+    const { error } = ValidationSchemas.removeFileSchema.validate(payload);
     if (error) {
         throw error;
     }
@@ -136,9 +180,12 @@ const removeAudioFile = async (payload) => {
     if (!user) {
         throw Boom.notFound('User does not exist')
     }
-    const { description, gcs_uri, created } = payload;
-    const audioFile = { description, gcs_uri, created };
-    updatedUser = await User.findByIdAndUpdate( userId, {$pull: { audioFiles: audioFile } }, { new: true });
+    const bucketName = "capstone-audios";
+    const fileName = payload.gcs_uri.split("/").slice(-1)[0];
+    await deleteFile(bucketName, fileName);
+    updatedUser = await User.findByIdAndUpdate( userId, { 
+        $pull: { audioFiles: { _id: payload._id } } 
+    }, { new: true });
     return updatedUser;
 }
 
@@ -158,4 +205,4 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, removeAudioFile, remove }
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove }

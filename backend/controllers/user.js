@@ -87,7 +87,7 @@ const update = async (ctx) => {
     };
 }
 
-const addAudioLink = async (ctx) => {
+const addAudioFile = async (ctx) => {
     const payload = {
         userId: ctx.params.userId,
         description: ctx.request.body.description,
@@ -103,14 +103,44 @@ const addAudioLink = async (ctx) => {
     };
 }
 
-const removeAudioLink = async (ctx) => {
+const removeAudioFile = async (ctx) => {
+    const payload = {
+        userId: ctx.params.userId,
+        _id: ctx.request.body._id,
+        gcs_uri: ctx.request.body.gcs_uri,
+    }
+    const response = await UserHandler.removeAudioFile(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
+const addSummaryFile = async (ctx) => {
     const payload = {
         userId: ctx.params.userId,
         description: ctx.request.body.description,
         gcs_uri: ctx.request.body.gcs_uri,
-        created: ctx.request.body.created
+        created: ctx.request.body.created,
     }
-    const response = await UserHandler.removeAudioFile(payload);
+    const response = await UserHandler.addSummaryFile(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
+const removeSummaryFile = async (ctx) => {
+    const payload = {
+        userId: ctx.params.userId,
+        _id: ctx.request.body._id,
+        gcs_uri: ctx.request.body.gcs_uri,
+    }
+    const response = await UserHandler.removeSummaryFile(payload);
     ctx.body = {
         meta: {
             status: 200
@@ -143,4 +173,4 @@ const remove = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioLink, removeAudioLink, remove }
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove }

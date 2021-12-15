@@ -1,10 +1,15 @@
 <template>
   <div class="container-fluid">
-    <h2><strong>Convert Your Audio Into Text Manuscript</strong></h2>
-    <br />
-    <div class="alert alert-danger" role="alert" v-if="invalidFileType">
-      {{ invalidFileError }}
+    <div class="row">
+      <h2><strong>Convert Your Audio Into Text Manuscript</strong></h2>
+      <br />
+      <div class="alert alert-danger" role="alert" v-if="invalidFileType">
+        {{ invalidFileError }}
+      </div>
     </div>
+
+    <br />
+
     <div class="row">
       <input
         type="file"
@@ -15,6 +20,29 @@
     </div>
 
     <br />
+
+    <div class="row align-items-center">
+      <div class="col-md-auto">
+        <label for="fileDescription"><b>Speaker Count:</b></label>
+      </div>
+      <div class="col">
+        <b-dropdown
+          id="dropdown-left"
+          :text="selected"
+          variant="none"
+          class="me-3 customDropdown"
+        >
+          <b-dropdown-item disabled>Please select one</b-dropdown-item>
+          <b-dropdown-item @click="selected = '1'">1</b-dropdown-item>
+          <b-dropdown-item @click="selected = '2'">2</b-dropdown-item>
+          <b-dropdown-item @click="selected = '3'">3</b-dropdown-item>
+          <b-dropdown-item @click="selected = '4'">4</b-dropdown-item>
+        </b-dropdown>
+      </div>
+    </div>
+
+    <br />
+
     <div class="row align-items-center">
       <div class="col-md-auto">
         <label for="fileDescription"><b>Description:</b></label
@@ -54,18 +82,6 @@
       </div>
     </div>
     &nbsp;
-    <!-- <div>
-      <b-progress
-        class="w-75"
-        :value="progressValue"
-        variant="success"
-        striped
-        show-progress
-        show-value
-        animated="animated"
-        v-show="true"
-      ></b-progress>
-    </div> -->
 
     <br />
     <b-table
@@ -78,6 +94,7 @@
       <template #cell(actions)="row">
         <b-button
           id="show-btn"
+          variant="danger"
           title="Delete File"
           @click="showModal(row.item, $event.target)"
           >Delete
@@ -85,6 +102,7 @@
         &nbsp;
         <b-button
           id="download-btn"
+          variant="success"
           title="Download File"
           @click="downloadFile(row)"
           ><b-icon icon="cloud-download" aria-hidden="true"></b-icon>
@@ -119,11 +137,10 @@ export default {
     return {
       file: null,
       description: "",
+      selected: "Please select one",
       headings: ["No.", "audio_file", "description", "created", "actions"],
       manuscriptHistory: [],
       inProgress: false,
-      timer: null,
-      progressValue: 0,
       deleteModal: {
         id: "delete-modal",
         title: "",
@@ -167,11 +184,11 @@ export default {
   },
   methods: {
     async getManuscriptHistory() {
-      const { data } = await this.$store.dispatch("getManuscriptList");
+      const { data } = await this.$store.dispatch("getUserDetails");
       const audioFiles = data.data.audioFiles.map((audioFile, index) => {
-        //audioFile.gcs_uri = audioFile.gcs_uri.split("/").slice(-1)[0];          BREAKS DELETION
-        const { gcs_uri, description, created } = audioFile;
+        const { _id, gcs_uri, description, created } = audioFile;
         return {
+          _id,
           "No.": index + 1,
           audio_file: gcs_uri,
           description: description,
@@ -207,36 +224,36 @@ export default {
       this.$root.$emit("bv::show::modal", this.deleteModal.id, button);
     },
     async downloadFile(row) {
-      const index = row.item["No."];
-      var doc = new jsPDF();
-      var lineNum = 20;
-      var splitText = doc.splitTextToSize(
-        this.$store.getters.getAudioText[index],
-        180
-      );
+      const _id = row.item._id;
+      let doc = new jsPDF();
+      let lineNum = 20;
+      doc
+        .setFont(undefined, "bold")
+        .text("Manuscript", 90, 10)
+        .setFont(undefined, "normal");
+      const currentAudioList = this.$store.getters.getAudioText;
+      const subList = currentAudioList.find((list) => list[0] !== _id);
+      let splitText = doc.splitTextToSize(subList[1], 180);
       doc.text(20, lineNum, splitText);
       const pdfName = row.item.audio_file.split("/").slice(-1)[0];
       doc.save(pdfName + ".pdf");
     },
     async removeHistory(data) {
       const gcs_uri = data.audio_file;
-      const description = data.description;
-      const created = data.created;
-      const payload = { gcs_uri, description, created };
+      const _id = data._id;
+      const payload = { _id, gcs_uri };
       await this.$store.dispatch("removeAudioFile", payload);
       await this.getManuscriptHistory();
     },
-    // loadProgressBar() {
-    //   while (this.progressValue < 100) {
-    //     console.log("Progress value: ", this.progressValue);
-    //     this.progressValue += 10;
-    //   }
-    // },
     async generateManuscript() {
       this.inProgress = true;
+      const speakerCount = isNaN(parseInt(this.selected))
+        ? undefined
+        : parseInt(this.selected);
+      const requestPayload = { file: this.file, speakerCount };
       const response = await this.$store.dispatch(
         "generateManuscript",
-        this.file
+        requestPayload
       );
       const sentenceInfo = response.data.transcript;
       // export api response into a pdf file
@@ -244,7 +261,10 @@ export default {
       var doc = new jsPDF();
       var docText = "";
       var lineNum = 20;
-      //this.loadProgressBar();
+      doc
+        .setFont(undefined, "bold")
+        .text("Manuscript", 90, 10)
+        .setFont(undefined, "normal");
       sentenceInfo.forEach((sentence) => {
         const key = Object.keys(sentence)[0];
         const speech = sentence[key];
@@ -252,8 +272,11 @@ export default {
         const speakerSentence = `${speaker[0]} ${speaker[1]}: ${speech}`;
         var splitText = doc.splitTextToSize(speakerSentence, 180);
         docText += splitText + "\n";
+        console.log("DocText Length: ", docText.length);
         doc.text(20, lineNum, splitText);
-        lineNum += 20;
+        if (docText.length >= 800) lineNum += 55;
+        else if (docText.length >= 400) lineNum += 35;
+        else if (docText.length >= 200) lineNum += 20;
       });
       doc.save(pdfName + ".pdf");
       this.$refs.fileupload.value = null;
@@ -269,8 +292,8 @@ export default {
         created,
         docText,
       };
-      await this.$store.dispatch("addAudioFile", payload);
       this.description = "";
+      await this.$store.dispatch("addAudioFile", payload);
       await this.getManuscriptHistory();
     },
   },
@@ -285,5 +308,9 @@ export default {
   color: #e32;
   content: " *";
   display: inline;
+}
+.customDropdown {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
 }
 </style>

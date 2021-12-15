@@ -6,22 +6,37 @@ const router = new Router({
   prefix: "/user",
 });
 
+// Login User
 router.post("/login", controller.loginUser);
 
+// Get All Users
 router.get("/", auth(["user", "admin"]), controller.getAll);
 
+// Get a User
 router.get("/:userId", auth(["user", "admin"]), controller.getUser);
 
+// Register New User
 router.post("/register", controller.registerUser);
 
+// Update a Specific User
 router.put("/:userId", auth(["user", "admin"]), controller.update);
 
-router.patch("/:userId/addAudioDetails", auth(["user", "admin"]), controller.addAudioLink)
+// Add Audio Details to a User
+router.patch("/:userId/addAudioDetails", auth(["user", "admin"]), controller.addAudioFile)
 
-router.patch("/:userId/removeAudioDetails", auth(["user", "admin"]), controller.removeAudioLink)
+// Add Audio Details to a User
+router.patch("/:userId/addSummaryDetails", auth(["user", "admin"]), controller.addSummaryFile)
 
-router.post("/resetPassword", auth(["user"]), controller.resetPassword);
+// Remove Audio Details
+router.patch("/:userId/removeAudioDetails", auth(["user", "admin"]), controller.removeAudioFile)
 
-router.delete("/:userId", auth(["admin"]), controller.remove);
+// Remove Summary Details
+router.patch("/:userId/removeSummaryDetails", auth(["user", "admin"]), controller.removeSummaryFile)
+
+// Reset Password
+router.post("/resetPassword", auth(["admin", "user"]), controller.resetPassword);
+
+// Remove a User
+router.delete("/:userId", auth(["admin", "user"]), controller.remove);
 
 module.exports = router.routes();

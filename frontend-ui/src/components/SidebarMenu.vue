@@ -95,7 +95,7 @@ export default {
       MANUSCRIPT: "manuscript",
       SUMMARY: "summary",
       FEEDBACK: "feedback",
-      currentTab: "dashboard",
+      currentTab: this.$store.getters.getCurrentTab,
     };
   },
   computed: {
@@ -118,6 +118,7 @@ export default {
   methods: {
     setFocus(currentTab) {
       this.currentTab = currentTab;
+      this.$store.commit("SET_CURRENT_TAB", currentTab);
       switch (currentTab) {
         case "dashboard":
           this.$router.push("/dashboard");

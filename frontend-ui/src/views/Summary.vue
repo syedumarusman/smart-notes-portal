@@ -1,34 +1,62 @@
 <template>
-  <div class="row">
-    <div class="col">
+  <div class="container-fluid">
+    <div class="row">
       <h2><strong>Convert Your Text Into A Summary</strong></h2>
-      <br />
       <div class="alert alert-danger" role="alert" v-if="invalidFileType">
         {{ invalidFileError }}
       </div>
-      <!-- <div>
-        <b-button v-b-modal.modal-1>Show Modal</b-button>
+    </div>
 
-        <b-modal id="modal-1" title="Vue Js Bootstrap Modal Example">
-          <p class="my-4">Content goes here...</p>
-        </b-modal>
-      </div> -->
-      <div class="row-style">
-        <input
-          type="file"
-          id="file"
-          ref="fileupload"
-          v-on:change="handleFileUpload($event)"
-        />
-        <input
+    <br />
+
+    <div class="row">
+      <input
+        type="file"
+        id="file"
+        ref="fileupload"
+        v-on:change="handleFileUpload($event)"
+      />
+    </div>
+
+    <br />
+    <div class="row align-items-center">
+      <div class="col-md-auto">
+        <label for="fileDescription"><b>Summary Sentence Count:</b></label>
+      </div>
+      <div class="col">
+        <b-dropdown
+          id="dropdown-left"
+          :text="selected"
+          variant="none"
+          class="me-3 customDropdown"
+        >
+          <b-dropdown-item disabled>Please select one</b-dropdown-item>
+          <b-dropdown-item @click="selected = '5'">5</b-dropdown-item>
+          <b-dropdown-item @click="selected = '10'">10</b-dropdown-item>
+          <b-dropdown-item @click="selected = '20'">20</b-dropdown-item>
+          <b-dropdown-item @click="selected = '50'">50</b-dropdown-item>
+        </b-dropdown>
+      </div>
+    </div>
+
+    <br />
+    <div class="row align-items-center">
+      <div class="col-md-auto">
+        <label for="fileDescription"><b>Description:</b></label
+        ><span class="required"> (required)</span>
+      </div>
+      <div class="col-md-9">
+        <b-form-input
           type="text"
           id="fileDescription"
-          class="form-control me-3"
           placeholder="Description"
           v-model="description"
+          v-on:blur="checkDescription"
           required
           autofocus
         />
+      </div>
+      <div class="col-md-auto">
         <button
           class="btn btn-primary"
           id="generateSummary"
@@ -42,16 +70,51 @@
           class="btn btn-primary"
           id="generateLoadingComponent"
           disabled
-          @click.prevent="generateSummary"
           v-if="inProgress"
         >
           <LoadingComponent width="15"></LoadingComponent>
         </button>
       </div>
-      <br />
-      <br />
-      <b-table />
     </div>
+
+    <br />
+    <b-table
+      :fields="headings"
+      :items="summaryHistory"
+      head-variant="dark"
+      v-if="summaryHistory.length"
+    >
+      <template #cell(actions)="row">
+        <b-button
+          id="show-btn"
+          variant="danger"
+          title="Delete File"
+          @click="showModal(row.item, $event.target)"
+          >Delete
+        </b-button>
+        &nbsp;
+        <b-button
+          id="download-btn"
+          variant="success"
+          title="Download File"
+          @click="downloadFile(row)"
+          ><b-icon icon="cloud-download" aria-hidden="true"></b-icon>
+        </b-button>
+      </template>
+    </b-table>
+
+    <b-modal
+      :id="deleteModal.id"
+      :title="deleteModal.title"
+      ok-variant="danger"
+      @ok="removeSummary(deleteModal.row)"
+    >
+      <p>
+        Are you sure you want to delete
+        {{ deleteModal.content }}
+        ?
+      </p>
+    </b-modal>
   </div>
 </template>
 
@@ -63,21 +126,36 @@ export default {
   components: {
     LoadingComponent: () => import("../components/LoadingComponent.vue"),
   },
-  async created() {
-    await this.getSummaryHistory();
-  },
   data() {
     return {
-      file: "",
+      file: null,
+      selected: "Please select one",
       description: "",
-      invalidFileType: false,
+      headings: ["No.", "summary_file", "description", "created", "actions"],
+      deleteModal: {
+        id: "delete-modal",
+        title: "",
+        row: null,
+        content: "",
+      },
+      summaryHistory: [],
       inProgress: false,
-      invalidFileError: "Invalid file type. Please upload a txt file!",
+      descriptionExists: false,
+      isEmptyError: "Description Cannot be left blank!",
+      invalidFileType: false,
+      invalidFileError: "Invalid file type. Please upload a text file!",
+      fileExists: false,
+      fileNotFoundError: "File not found. Please upload a file!",
     };
+  },
+  created() {
+    this.getSummaryHistory();
   },
   computed: {
     isDisabled() {
-      return typeof this.file !== "object" || this.inProgress;
+      return (
+        this.file === null || this.description.length === 0 || this.inProgress
+      );
     },
   },
   watch: {
@@ -86,54 +164,142 @@ export default {
         this.invalidFileType = false;
       }, 4000);
     },
+    descriptionExists() {
+      setTimeout(() => {
+        this.descriptionExists = false;
+      }, 4000);
+    },
+    fileExists() {
+      setTimeout(() => {
+        this.fileExists = false;
+      }, 4000);
+    },
   },
   methods: {
     async getSummaryHistory() {
-      console.log("get Summary list");
+      const { data } = await this.$store.dispatch("getUserDetails");
+      const summaryFiles = data.data.summaryFiles.map((summaryFile, index) => {
+        const { _id, gcs_uri, description, created } = summaryFile;
+        return {
+          _id,
+          "No.": index + 1,
+          summary_file: gcs_uri,
+          description: description,
+          created: created,
+        };
+      });
+      this.summaryHistory = summaryFiles;
     },
     handleFileUpload(event) {
       const file = event.target.files[0];
-      if (file) {
-        console.log(file);
-        if (file.type == "text/plain") {
-          this.file = file;
-        } else {
-          this.invalidFileType = true;
-        }
+      if (!file) {
+        this.$refs.fileupload.value = null;
+        this.file = null;
+        return;
       }
+      if (file.type == "text/plain") {
+        this.file = file;
+      } else {
+        this.invalidFileType = true;
+        this.$refs.fileupload.value = null;
+        this.file = null;
+      }
+    },
+    checkDescription() {
+      return this.description.length === 0;
+    },
+    showModal(row, button) {
+      this.deleteModal.title = `Deleting Summary ${
+        row.summary_file.split("/").slice(-1)[0]
+      }`;
+      this.deleteModal.content = row.summary_file.split("/").slice(-1)[0];
+      this.deleteModal.row = row;
+      this.$root.$emit("bv::show::modal", this.deleteModal.id, button);
+    },
+    async removeSummary(data) {
+      const gcs_uri = data.summary_file;
+      const _id = data._id;
+      const payload = { _id, gcs_uri };
+      await this.$store.dispatch("removeSummaryFile", payload);
+      await this.getSummaryHistory();
+    },
+    async downloadFile(row) {
+      const _id = row.item._id;
+      let doc = new jsPDF();
+      let lineNum = 20;
+      doc
+        .setFont(undefined, "bold")
+        .text("Summary", 90, 10)
+        .setFont(undefined, "normal");
+      const currentSummaryList = this.$store.getters.getSummaryText;
+      const subList = currentSummaryList.find((list) => list[0] !== _id);
+      let splitText = doc.splitTextToSize(subList[1], 180);
+      doc.text(20, lineNum, splitText);
+      const pdfName = row.item.summary_file.split("/").slice(-1)[0];
+      doc.save(pdfName + ".pdf");
     },
     async generateSummary() {
       this.inProgress = true;
-      const response = await this.$store.dispatch("generateSummary", this.file);
-      const sentenceInfo = response.data.transcript;
+      const sentenceCount = isNaN(parseInt(this.selected))
+        ? undefined
+        : parseInt(this.selected);
+      const payload = { file: this.file, sentenceCount };
+      const response = await this.$store.dispatch("generateSummary", payload);
+      const summaryData = response.data.sentences;
+      if (summaryData.length === 0) {
+        this.$refs.fileupload.value = null;
+        this.file = null;
+        this.inProgress = false;
+        return;
+      }
       // export api response into a pdf file
       let pdfName = this.file.name;
       var doc = new jsPDF();
+      var text = "";
       var lineNum = 20;
-      sentenceInfo.forEach((sentence, index) => {
-        const key = Object.keys(sentence)[0];
-        const speech = sentence[key];
-        const speakerSentence = `Sentence ${index + 1}: ${speech}`;
-        var splitText = doc.splitTextToSize(speakerSentence, 180);
+      doc
+        .setFont(undefined, "bold")
+        .text("Summary", 90, 10)
+        .setFont(undefined, "normal");
+      summaryData.forEach((sentence) => {
+        var splitText = doc.splitTextToSize(sentence, 180);
+        text += splitText + "\n";
         doc.text(20, lineNum, splitText);
-        lineNum += 20;
+        lineNum += 30;
       });
       doc.save(pdfName + ".pdf");
-      this.file = "";
       this.$refs.fileupload.value = null;
+      this.file = null;
       this.inProgress = false;
 
-      // add text link to user's document in the database
-      const textLink = response.data.gcs_uri;
-      await this.$store.dispatch("addTextFile", textLink);
+      // add summary details to the database
+      const gcs_uri = response.data.gcs_uri;
+      const created = new Date().toLocaleDateString();
+      const requestPayload = {
+        gcs_uri,
+        description: this.description,
+        created,
+        text,
+      };
+      this.description = "";
+      await this.$store.dispatch("addSummaryFile", requestPayload);
+      await this.getSummaryHistory();
     },
   },
 };
 </script>
 
 <style scoped>
-.row-style {
-  display: flex;
-  justify-content: space-between;
+.required {
+  font-weight: normal;
+}
+.required:after {
+  color: #e32;
+  content: " *";
+  display: inline;
+}
+.customDropdown {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
 }
 </style>
