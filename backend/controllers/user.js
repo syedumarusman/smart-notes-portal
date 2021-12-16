@@ -173,4 +173,22 @@ const remove = async (ctx) => {
     };
 }
 
-module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove }
+const addFeedback = async (ctx) => {
+    const payload = {
+        userId: ctx.params.userId,
+        feedbackType: ctx.request.body.feedbackType,
+        q1: ctx.request.body.q1,
+        q2: ctx.request.body.q2,
+        q3: ctx.request.body.q3,
+        comment: ctx.request.body.comment,
+    }
+    const response = await UserHandler.addFeedback(payload);
+    ctx.body = {
+        meta: {
+            status: 200
+        },
+        data: response
+    };
+}
+
+module.exports = { getAll, getUser, loginUser, registerUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove, addFeedback }

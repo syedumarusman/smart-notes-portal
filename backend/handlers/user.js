@@ -206,4 +206,29 @@ const remove = async (userId) => {
     return response;
 }
 
-module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove }
+const addFeedback = async (payload) => {
+    const { error } = ValidationSchemas.createSchema.validate(payload);
+    if (error) {
+        throw error;
+    }
+    const userId = ObjectId(payload.userId);
+    const user = await User.findOne({ _id: userId });
+    if (user) {
+        throw Boom.badRequest('This User already exists');
+    }
+    const { feedbackType, q1, q2, q3, comment } = payload;
+    const feedback = { 
+        _id: ObjectId(), 
+        feedbackType, q1, q2, q3, comment 
+    };
+    if(feedback.feedbackType === "manuscript") {
+        user.manuscriptFeedback.push(feedback);
+    } else {
+        user.summaryFeedback.push(feedback);
+    }
+    await user.save();
+    return feedback;
+}
+
+
+module.exports = { getAll, getUser, loginUserWithEmail, loginUserWithUsername, createUser, resetPassword, update, addAudioFile, removeAudioFile, addSummaryFile, removeSummaryFile, remove, addFeedback }

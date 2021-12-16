@@ -57,4 +57,13 @@ const manuscriptSchema = Joi.object({
   file: Joi.object().required()
 })
 
-module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, FileSchema, removeFileSchema, removeSchema, manuscriptSchema }
+const addFeedbackSchema = Joi.object({
+  userId: Joi.string().required(),
+  feedbackType: Joi.string().valid(["manuscript","summary"]).required(),
+  q1: Joi.string().required(),  
+  q2: Joi.string().required(),  
+  q3: Joi.string().required(),
+  comment: Joi.string().max(500).required()
+})
+
+module.exports = { getUserSchema, loginUsernameSchema, loginEmailSchema, createSchema, resetPasswordSchema, updateSchema, FileSchema, removeFileSchema, removeSchema, manuscriptSchema, addFeedbackSchema }
