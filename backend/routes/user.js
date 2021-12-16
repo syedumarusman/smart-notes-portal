@@ -40,6 +40,6 @@ router.post("/resetPassword", auth(["admin", "user"]), controller.resetPassword)
 router.delete("/:userId", auth(["admin", "user"]), controller.remove);
 
 // Add a Feedback
-router.post("/:userId/addFeedback", auth(["admin", "user"]), controller.addFeedback);
+router.patch("/:userId/addFeedback", auth(["admin", "user"]), controller.addFeedback);
 
 module.exports = router.routes();

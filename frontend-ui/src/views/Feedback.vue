@@ -29,12 +29,12 @@
           <b-dropdown-item disabled>Please select one</b-dropdown-item>
           <b-dropdown-item
             name="manuscript"
-            @click="handleDropDownSelected($event)"
+            @click="handleDropDownSelected(manuscript)"
             >Manuscript</b-dropdown-item
           >
           <b-dropdown-item
             name="summary"
-            @click="handleDropDownSelected($event)"
+            @click="handleDropDownSelected(summary)"
             >Summary</b-dropdown-item
           >
         </b-dropdown>
@@ -47,13 +47,22 @@
 
     <br />
 
+    <div class="alert alert-danger" role="alert" v-if="invalidFeedbackForm">
+      {{ invalidFeedbackError }}
+    </div>
+    <div class="alert alert-success" role="alert" v-if="feedbackSubmitted">
+      {{ successMessage }}
+    </div>
+
+    <br />
+
     <div v-if="showManuscriptQuestions">
       <div class="row">
         <h3 style="padding-left: 180px">
           <strong>Manuscript Feedback</strong>
         </h3>
         &nbsp;
-        <div class="col-sm-12 form-group">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -74,10 +83,10 @@
             />
           </p>
         </div>
-
-        <br />
-
-        <div class="col-sm-12 form-group">
+      </div>
+      <br />
+      <div class="row">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -95,10 +104,10 @@
             />
           </p>
         </div>
-
-        <br />
-
-        <div class="col-sm-12 form-group">
+      </div>
+      <br />
+      <div class="row">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -119,8 +128,10 @@
           </p>
         </div>
       </div>
+      <br />
       <div class="row">
-        <div class="col-sm-12 form-group">
+        <div class="col-sm-4 form-group">
+          <span class="required"></span> &nbsp;
           <label for="comments"> Comments:</label>
           <textarea
             class="form-control"
@@ -132,14 +143,13 @@
           ></textarea>
         </div>
       </div>
-
-      &nbsp;
+      <br />
       <div class="row">
         <div class="form-group">
           <button
             type="submit"
             class="btn btn-lg btn-primary btn-block"
-            v-on:click="onSubmit"
+            v-on:click="showModal()"
           >
             Submit
           </button>
@@ -147,12 +157,11 @@
       </div>
     </div>
     <div v-if="showSummaryQuestions">
+      <h3 style="padding-left: 180px">
+        <strong>Summary Feedback</strong>
+      </h3>
       <div class="row">
-        <h3 style="padding-left: 180px">
-          <strong>Summary Feedback</strong>
-        </h3>
-        &nbsp;
-        <div class="col-sm-12 form-group">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -173,10 +182,10 @@
             />
           </p>
         </div>
-
-        <br />
-
-        <div class="col-sm-12 form-group">
+      </div>
+      <br />
+      <div class="row">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -194,10 +203,10 @@
             />
           </p>
         </div>
-
-        <br />
-
-        <div class="col-sm-12 form-group">
+      </div>
+      <br />
+      <div class="row">
+        <div class="col form-group">
           <h5>
             <span class="required"></span>
             &nbsp;
@@ -218,8 +227,10 @@
           </p>
         </div>
       </div>
+      <br />
       <div class="row">
-        <div class="col-sm-12 form-group">
+        <div class="col-sm-4 form-group">
+          <span class="required"></span> &nbsp;
           <label for="comments"> Comments:</label>
           <textarea
             class="form-control"
@@ -231,16 +242,29 @@
           ></textarea>
         </div>
       </div>
-
-      &nbsp;
+      <br />
       <div class="row">
         <div class="form-group">
-          <button type="submit" class="btn btn-lg btn-primary btn-block">
+          <button
+            type="submit"
+            class="btn btn-lg btn-primary btn-block"
+            v-on:click="showModal()"
+          >
             Submit
           </button>
         </div>
       </div>
     </div>
+    <b-modal
+      :id="submitModal.id"
+      :title="submitModal.title"
+      ok-variant="primary"
+      @ok="onSubmit()"
+    >
+      <p>
+        {{ submitModal.content }}
+      </p>
+    </b-modal>
   </div>
 </template>
 
@@ -253,7 +277,14 @@ export default {
   data() {
     return {
       ratings: ["Very Poor", "Poor", "Average", "Good", "Very Good"],
+      manuscript: "manuscript",
+      summary: "summary",
       feedbackType: "Please select one",
+      submitModal: {
+        id: "submit-modal",
+        title: "",
+        content: "",
+      },
       q1: "",
       q2: "",
       q3: "",
@@ -262,18 +293,39 @@ export default {
       showManuscriptQuestions: false,
       showSummaryQuestions: false,
       radioButtonSelected: "",
+      invalidFeedbackForm: false,
+      invalidFeedbackError:
+        "Invalid Feedback Form. Please fill out all required fields!",
+      feedbackSubmitted: false,
+      successMessage: "Feedback has been successfully submitted!",
     };
   },
+  watch: {
+    invalidFeedbackForm() {
+      setTimeout(() => {
+        this.invalidFeedbackForm = false;
+      }, 5000);
+    },
+    feedbackSubmitted() {
+      setTimeout(() => {
+        this.feedbackSubmitted = false;
+      }, 5000);
+    },
+  },
   methods: {
-    handleDropDownSelected(event) {
+    handleDropDownSelected(name) {
       this.resetValue = !this.resetValue;
-      this.feedbackType = event.target.__vue__.$attrs.name;
+      this.comment = "";
+      this.feedbackType = name;
       if (this.feedbackType == "manuscript") {
         this.showManuscriptQuestions = true;
         this.showSummaryQuestions = false;
       } else if (this.feedbackType == "summary") {
         this.showSummaryQuestions = true;
         this.showManuscriptQuestions = false;
+      } else {
+        this.showManuscriptQuestions = false;
+        this.showSummaryQuestions = false;
       }
     },
     onSelect(rating, question) {
@@ -285,6 +337,23 @@ export default {
         this.q3 = rating;
       }
     },
+    showModal() {
+      this.submitModal.title = `Submitting Feedback for ${this.feedbackType}`;
+      this.submitModal.content = `Are you sure you want to submit feedback for ${this.feedbackType}?`;
+      this.$root.$emit("bv::show::modal", this.submitModal.id);
+    },
+    validateFields() {
+      if (
+        this.q1 === "" ||
+        this.q2 === "" ||
+        this.q3 === "" ||
+        this.comment === ""
+      ) {
+        this.invalidFeedbackForm = true;
+        return false;
+      }
+      return true;
+    },
     async onSubmit() {
       const payload = {
         feedbackType: this.feedbackType,
@@ -293,10 +362,13 @@ export default {
         q3: this.q3,
         comment: this.comment,
       };
-
-      const response = await this.$store.dispatch("submitFeedback", payload);
-
-      console.log(response);
+      if (this.validateFields()) {
+        const response = await this.$store.dispatch("submitFeedback", payload);
+        if (response.data) {
+          this.feedbackSubmitted = true;
+          this.handleDropDownSelected("Please select one");
+        }
+      }
     },
   },
 };
