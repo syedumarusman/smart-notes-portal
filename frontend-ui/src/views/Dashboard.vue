@@ -50,7 +50,7 @@
     </div>
 
     <div class="row justify-content-center">
-      <div id="chart" class="col-4">
+      <div id="chart1" class="col-4">
         <apexchart
           v-if="!emptyChart"
           type="pie"
@@ -59,12 +59,20 @@
           :series="series"
         ></apexchart>
       </div>
+      <div id="chart2" class="col-4">
+        <apexchart
+          v-if="!emptyFeedbackChart"
+          type="pie"
+          width="625"
+          :options="feedbackOptions"
+          :series="feedbackSeries"
+        ></apexchart>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import VueApexCharts from "vue-apexcharts";
 
 export default {
@@ -75,6 +83,11 @@ export default {
   data() {
     return {
       series: [],
+      feedbackSeries: [],
+      getAudioTextCount: 0,
+      getSummaryTextCount: 0,
+      getTotalGenerations: 0,
+      getTotalFeedbackSubmissions: 0,
       chartOptions: {
         labels: ["Manuscripts", "Summaries", "Feedbacks", "Total Generations"],
         legend: {
@@ -90,22 +103,39 @@ export default {
           },
         },
       },
+      manuscriptFeedbackCount: 0,
+      summaryFeedbackCount: 0,
+      feedbackOptions: {
+        labels: ["Manuscript Feedbacks", "Summary Feedbacks"],
+        legend: {
+          show: true,
+          fontSize: "14px",
+        },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: "16px",
+            fontFamily: "Helvetica, Arial, sans-serif",
+            fontWeight: "bold",
+          },
+        },
+      },
     };
   },
-  created() {
+  async created() {
+    await this.getStats();
     this.series = [
       this.getAudioTextCount,
       this.getSummaryTextCount,
       0,
       this.getTotalGenerations,
     ];
+    this.feedbackSeries = [
+      this.manuscriptFeedbackCount,
+      this.summaryFeedbackCount,
+    ];
   },
   computed: {
-    ...mapGetters([
-      "getAudioTextCount",
-      "getSummaryTextCount",
-      "getTotalGenerations",
-    ]),
     emptyChart() {
       return (
         this.getAudioTextCount +
@@ -114,8 +144,25 @@ export default {
         0
       );
     },
+    emptyFeedbackChart() {
+      return this.manuscriptFeedbackCount + this.summaryFeedbackCount === 0;
+    },
   },
-  methods: {},
+  methods: {
+    async getStats() {
+      const {
+        data: { data },
+      } = await this.$store.dispatch("getUserDetails");
+
+      this.getAudioTextCount = data.audioFiles.length;
+      this.getSummaryTextCount = data.summaryFiles.length;
+      this.getTotalGenerations =
+        this.getAudioTextCount + this.getSummaryTextCount;
+
+      this.manuscriptFeedbackCount = data.manuscriptFeedbacks.length;
+      this.summaryFeedbackCount = data.summaryFeedbacks.length;
+    },
+  },
 };
 </script>
 

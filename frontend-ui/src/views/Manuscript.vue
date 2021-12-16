@@ -107,7 +107,18 @@
           variant="success"
           title="Download File"
           @click="downloadFile(row)"
+          v-if="!downloading"
           ><b-icon icon="cloud-download" aria-hidden="true"></b-icon>
+        </b-button>
+
+        <b-button
+          class="btn btn-primary"
+          id="generateLoadingComponent"
+          variant="success"
+          disabled
+          v-if="downloading"
+        >
+          <LoadingComponent width="15"></LoadingComponent>
         </b-button>
       </template>
     </b-table>
@@ -143,6 +154,7 @@ export default {
       headings: ["No.", "audio_file", "description", "created", "actions"],
       manuscriptHistory: [],
       inProgress: false,
+      downloading: false,
       deleteModal: {
         id: "delete-modal",
         title: "",
@@ -226,6 +238,10 @@ export default {
       this.$root.$emit("bv::show::modal", this.deleteModal.id, button);
     },
     async downloadFile(row) {
+      const {
+        data: { data },
+      } = await this.$store.dispatch("getUserDetails");
+      this.downloading = true;
       const _id = row.item._id;
       let doc = new jsPDF();
       let lineNum = 20;
@@ -233,11 +249,27 @@ export default {
         .setFont(undefined, "bold")
         .text("Manuscript", 90, 10)
         .setFont(undefined, "normal");
-      const currentAudioList = this.$store.getters.getAudioText;
-      const subList = currentAudioList.find((list) => list[0] === _id);
-      let splitText = doc.splitTextToSize(subList[1], 180);
-      doc.text(20, lineNum, splitText);
-      const pdfName = row.item.audio_file.split("/").slice(-1)[0];
+      const currentAudioList = data.audioFiles;
+      const fileObject = currentAudioList.find((item) => item._id == _id);
+      const gcs_uri = fileObject.gcs_uri;
+      const response = await this.$store.dispatch("getManuscript", gcs_uri);
+      const sentenceInfo = response.data.transcript;
+      // export api response into a pdf file
+      let pdfName = gcs_uri.split("/")[3];
+      var docText = "";
+      sentenceInfo.forEach((sentence) => {
+        const key = Object.keys(sentence)[0];
+        const speech = sentence[key];
+        const speaker = key.split(/(\d+)/);
+        const speakerSentence = `${speaker[0]} ${speaker[1]}: ${speech}`;
+        var splitText = doc.splitTextToSize(speakerSentence, 180);
+        docText += splitText + "\n";
+        doc.text(20, lineNum, splitText);
+        if (docText.length >= 800) lineNum += 50;
+        else if (docText.length >= 400) lineNum += 40;
+        else if (docText.length >= 200) lineNum += 30;
+        else lineNum += 20;
+      });
       doc.save(pdfName + ".pdf");
     },
     async removeHistory(data) {
@@ -292,7 +324,6 @@ export default {
         gcs_uri,
         description: this.description,
         created,
-        docText,
       };
       this.description = "";
       await this.$store.dispatch("addAudioFile", payload);

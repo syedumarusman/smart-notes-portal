@@ -10,8 +10,6 @@ const store = new Vuex.Store({
     auth_status: false,
     token: "",
     currentUser: {},
-    audioText: [],
-    summaryText: [],
     manuscriptFeedbacks: [],
     summaryFeedbacks: [],
     currentTab: "",
@@ -25,20 +23,6 @@ const store = new Vuex.Store({
     },
     SET_CURRENT_USER: (state, user) => {
       state.currentUser = user;
-    },
-    SET_AUDIO_TEXT: (state, payload) => {
-      const subList = [payload._id, payload.text];
-      state.audioText.push(subList);
-    },
-    REMOVE_AUDIO_TEXT: (state, _id) => {
-      state.audioText = state.audioText.filter((items) => items[0] !== _id);
-    },
-    SET_SUMMARY_TEXT: (state, payload) => {
-      const subList = [payload._id, payload.text];
-      state.summaryText.push(subList);
-    },
-    REMOVE_SUMMARY_TEXT: (state, _id) => {
-      state.summaryText = state.summaryText.filter((items) => items[0] !== _id);
     },
     SET_MANUSCRIPT_FEEDBACKS: (state, feedback) => {
       state.manuscriptFeedbacks.push(feedback);
@@ -114,37 +98,25 @@ const store = new Vuex.Store({
         },
       });
     },
-    addSummaryFile: async ({ commit, getters }, payload) => {
-      const text = payload.text;
-      delete payload.text;
-      const response = await HTTP.patch(
+    addSummaryFile: ({ getters }, payload) => {
+      return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/addSummaryDetails`,
         payload
       );
-      const _id = response.data.data._id;
-      const data = { _id, text };
-      commit("SET_SUMMARY_TEXT", data);
     },
-    removeSummaryFile: async ({ getters, commit }, payload) => {
-      commit("REMOVE_SUMMARY_TEXT", payload._id);
+    removeSummaryFile: async ({ getters }, payload) => {
       return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/removeSummaryDetails`,
         payload
       );
     },
-    addAudioFile: async ({ commit, getters }, payload) => {
-      const text = payload.docText;
-      delete payload.docText; // Removes PDF document from payload before updating audios
-      const response = await HTTP.patch(
+    addAudioFile: ({ getters }, payload) => {
+      return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/addAudioDetails`,
         payload
       );
-      const _id = response.data.data._id;
-      const data = { _id, text };
-      commit("SET_AUDIO_TEXT", data);
     },
-    removeAudioFile: async ({ getters, commit }, payload) => {
-      commit("REMOVE_AUDIO_TEXT", payload._id);
+    removeAudioFile: async ({ getters }, payload) => {
       return HTTP.patch(
         `user/${getters.getCurrentUser.userId}/removeAudioDetails`,
         payload
@@ -161,6 +133,9 @@ const store = new Vuex.Store({
         commit("SET_SUMMARY_FEEDBACKS", response);
       }
       return response;
+    },
+    getManuscript: async (context, gcs_uri) => {
+      return HTTP_Flask.get("/transcribe/", { params: { gcs_uri } });
     },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");
@@ -187,12 +162,6 @@ const store = new Vuex.Store({
     },
     getCurrentTab(state) {
       return state.currentTab;
-    },
-    getAudioTextCount(state) {
-      return state.audioText.length;
-    },
-    getSummaryTextCount(state) {
-      return state.summaryText.length;
     },
     getTotalGenerations(state) {
       return state.audioText.length + state.summaryText.length;

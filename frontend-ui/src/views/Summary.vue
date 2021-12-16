@@ -227,6 +227,9 @@ export default {
       await this.getSummaryHistory();
     },
     async downloadFile(row) {
+      const {
+        data: { data },
+      } = await this.$store.dispatch("getUserDetails");
       const _id = row.item._id;
       let doc = new jsPDF();
       let lineNum = 20;
@@ -234,8 +237,8 @@ export default {
         .setFont(undefined, "bold")
         .text("Summary", 90, 10)
         .setFont(undefined, "normal");
-      const currentSummaryList = this.$store.getters.getSummaryText;
-      const subList = currentSummaryList.find((list) => list[0] === _id);
+      const currentSummaryList = data.summaryFiles;
+      const subList = currentSummaryList.find((item) => item._id === _id);
       let splitText = doc.splitTextToSize(subList[1], 180);
       doc.text(20, lineNum, splitText);
       const pdfName = row.item.summary_file.split("/").slice(-1)[0];
@@ -258,7 +261,6 @@ export default {
       // export api response into a pdf file
       let pdfName = this.file.name;
       var doc = new jsPDF();
-      var text = "";
       var lineNum = 20;
       doc
         .setFont(undefined, "bold")
@@ -266,7 +268,6 @@ export default {
         .setFont(undefined, "normal");
       summaryData.forEach((sentence) => {
         var splitText = doc.splitTextToSize(sentence, 180);
-        text += splitText + "\n";
         doc.text(20, lineNum, splitText);
         lineNum += 30;
       });
@@ -282,7 +283,6 @@ export default {
         gcs_uri,
         description: this.description,
         created,
-        text,
       };
       this.description = "";
       await this.$store.dispatch("addSummaryFile", requestPayload);
