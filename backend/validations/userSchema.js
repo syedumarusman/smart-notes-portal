@@ -59,7 +59,7 @@ const manuscriptSchema = Joi.object({
 
 const addFeedbackSchema = Joi.object({
   userId: Joi.string().required(),
-  feedbackType: Joi.string().valid(["manuscript","summary"]).required(),
+  feedbackType: Joi.string().valid("manuscript","summary").required(),
   q1: Joi.string().required(),  
   q2: Joi.string().required(),  
   q3: Joi.string().required(),
