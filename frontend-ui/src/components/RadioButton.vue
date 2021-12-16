@@ -3,10 +3,11 @@
     <input
       class="form-check-input"
       type="radio"
-      name="radioButtonOption"
+      :name="radioButtonName"
       v-model="checked"
       :id="id"
       required
+      v-on:click="selected($event)"
     />
     <label class="form-check-label customRadio" :for="id">
       {{ rating }}
@@ -17,7 +18,7 @@
 <script>
 export default {
   name: "radio-button",
-  props: ["index", "rating", "resetValue"],
+  props: ["index", "rating", "resetValue", "radioButtonName"],
   data() {
     return {
       checked: 0,
@@ -25,7 +26,7 @@ export default {
   },
   computed: {
     id() {
-      return "radioButtonOption" + this.index;
+      return "radioButtonOption" + this.index + new Date().getTime();
     },
   },
   watch: {
@@ -36,6 +37,9 @@ export default {
   methods: {
     reset() {
       this.checked = 0;
+    },
+    selected() {
+      this.$emit("clicked", this.rating, this.radioButtonName);
     },
   },
 };

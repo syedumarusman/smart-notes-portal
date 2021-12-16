@@ -12,6 +12,8 @@ const store = new Vuex.Store({
     currentUser: {},
     audioText: [],
     summaryText: [],
+    manuscriptFeedbacks: [],
+    summaryFeedbacks: [],
     currentTab: "",
   },
   mutations: {
@@ -37,6 +39,12 @@ const store = new Vuex.Store({
     },
     REMOVE_SUMMARY_TEXT: (state, _id) => {
       state.summaryText = state.summaryText.filter((items) => items[0] !== _id);
+    },
+    SET_MANUSCRIPT_FEEDBACKS: (state, feedback) => {
+      state.manuscriptFeedbacks.push(feedback);
+    },
+    SET_SUMMARY_FEEDBACKS: (state, feedback) => {
+      state.summaryFeedbacks.push(feedback);
     },
     SET_CURRENT_TAB: (state, currentTab) => {
       state.currentTab = currentTab;
@@ -142,6 +150,18 @@ const store = new Vuex.Store({
         payload
       );
     },
+    submitFeedback: async ({ commit, getters }, payload) => {
+      const response = await HTTP.patch(
+        `user/${getters.getCurrentUser.userId}/addFeedback`,
+        payload
+      );
+      if (payload.feedbackType === "manuscript") {
+        commit("SET_MANUSCRIPT_FEEDBACKS", response);
+      } else if (payload.feedbackType === "summary") {
+        commit("SET_SUMMARY_FEEDBACKS", response);
+      }
+      return response;
+    },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");
       commit("SET_CURRENT_USER", {});
@@ -176,6 +196,12 @@ const store = new Vuex.Store({
     },
     getTotalGenerations(state) {
       return state.audioText.length + state.summaryText.length;
+    },
+    getManuscriptFeedbacks(state) {
+      return state.manuscriptFeedbacks;
+    },
+    getSummaryFeedbacks(state) {
+      return state.summaryFeedbacks;
     },
   },
   plugins: [
