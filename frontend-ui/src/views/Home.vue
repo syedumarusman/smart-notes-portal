@@ -30,6 +30,7 @@ export default {
 
 <style>
 .container-fluid {
+  overflow-x: hidden;
   padding-right: 0;
   padding-left: 0;
   margin-right: auto;

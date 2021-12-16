@@ -137,6 +137,9 @@ const store = new Vuex.Store({
     getManuscript: async (context, gcs_uri) => {
       return HTTP_Flask.get("/transcribe/", { params: { gcs_uri } });
     },
+    getSummary: async (context, gcs_uri) => {
+      return HTTP_Flask.get("/summarize/", { params: { gcs_uri } });
+    },
     logout: ({ commit }) => {
       commit("SET_TOKEN", "");
       commit("SET_CURRENT_USER", {});

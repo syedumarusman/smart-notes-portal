@@ -17,8 +17,6 @@ export default {
 .widget {
   margin-top: 5px;
   margin-bottom: 5px;
-  margin-left: 25px;
-  margin-right: 25px;
   text-align: center;
 }
 .loader {

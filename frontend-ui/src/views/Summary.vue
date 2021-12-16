@@ -88,21 +88,37 @@
       v-if="summaryHistory.length"
     >
       <template #cell(actions)="row">
-        <b-button
-          id="show-btn"
-          variant="danger"
-          title="Delete File"
-          @click="showModal(row.item, $event.target)"
-          >Delete
-        </b-button>
-        &nbsp;
-        <b-button
-          id="download-btn"
-          variant="success"
-          title="Download File"
-          @click="downloadFile(row)"
-          ><b-icon icon="cloud-download" aria-hidden="true"></b-icon>
-        </b-button>
+        <b-row>
+          <b-col sm="3">
+            <button
+              class="btn btn-danger w-100"
+              variant="danger"
+              title="Delete File"
+              @click="showModal(row.item, $event.target)"
+            >
+              Delete
+            </button>
+          </b-col>
+          <b-col sm="3">
+            <button
+              class="btn btn-success w-100"
+              variant="success"
+              title="Download File"
+              @click="downloadFile(row)"
+              v-if="row.item._id !== downloadId"
+            >
+              <b-icon icon="cloud-download" aria-hidden="true"></b-icon>
+            </button>
+            <button
+              class="btn btn-success w-100"
+              variant="success"
+              disabled
+              v-if="row.item._id === downloadId"
+            >
+              <LoadingComponent width="15"></LoadingComponent>
+            </button>
+          </b-col>
+        </b-row>
       </template>
     </b-table>
 
@@ -143,6 +159,7 @@ export default {
       },
       summaryHistory: [],
       inProgress: false,
+      downloadId: "",
       descriptionExists: false,
       isEmptyError: "Description Cannot be left blank!",
       invalidFileType: false,
@@ -227,9 +244,11 @@ export default {
       await this.getSummaryHistory();
     },
     async downloadFile(row) {
+      this.downloadId = row.item._id;
       const {
         data: { data },
       } = await this.$store.dispatch("getUserDetails");
+      this.downloading = true;
       const _id = row.item._id;
       let doc = new jsPDF();
       let lineNum = 20;
@@ -238,11 +257,18 @@ export default {
         .text("Summary", 90, 10)
         .setFont(undefined, "normal");
       const currentSummaryList = data.summaryFiles;
-      const subList = currentSummaryList.find((item) => item._id === _id);
-      let splitText = doc.splitTextToSize(subList[1], 180);
-      doc.text(20, lineNum, splitText);
-      const pdfName = row.item.summary_file.split("/").slice(-1)[0];
+      const fileObject = currentSummaryList.find((item) => item._id == _id);
+      const gcs_uri = fileObject.gcs_uri;
+      const response = await this.$store.dispatch("getSummary", gcs_uri);
+      const sentences = response.data;
+      let pdfName = gcs_uri.split("/")[3];
+      sentences.forEach((sentence) => {
+        var splitText = doc.splitTextToSize(sentence, 180);
+        doc.text(20, lineNum, splitText);
+        lineNum += 30;
+      });
       doc.save(pdfName + ".pdf");
+      this.downloadId = "";
     },
     async generateSummary() {
       this.inProgress = true;

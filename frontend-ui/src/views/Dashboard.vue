@@ -34,13 +34,28 @@
 
     <div class="row">
       <div class="col">
-        <div class="card bg-c-yellow order-card">
+        <div class="card bg-c-pink order-card">
           <div class="card-block">
             <h3 class="m-b-20">Total Generations</h3>
             <h1 class="text-right">
               <p class="f-right">
                 <b-icon icon="layers"></b-icon>&nbsp;{{
                   this.getTotalGenerations
+                }}
+              </p>
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card bg-c-yellow order-card">
+          <div class="card-block">
+            <h3 class="m-b-20">Feedbacks</h3>
+            <h1 class="text-right">
+              <p class="f-right">
+                <b-icon icon="chat-left-text"></b-icon>&nbsp;{{
+                  this.getTotalFeedbackSubmissions
                 }}
               </p>
             </h1>
@@ -89,6 +104,16 @@ export default {
       getTotalGenerations: 0,
       getTotalFeedbackSubmissions: 0,
       chartOptions: {
+        title: {
+          text: "Generation Service Usage",
+          margin: 30,
+          style: {
+            fontSize: "20px",
+            fontWeight: "bold",
+            fontFamily: "Helvetica, Arial, sans-serif",
+            color: "#263238",
+          },
+        },
         labels: ["Manuscripts", "Summaries", "Feedbacks", "Total Generations"],
         legend: {
           show: true,
@@ -106,7 +131,18 @@ export default {
       manuscriptFeedbackCount: 0,
       summaryFeedbackCount: 0,
       feedbackOptions: {
+        title: {
+          text: "Feedbacks Submitted",
+          margin: 30,
+          style: {
+            fontSize: "20px",
+            fontWeight: "bold",
+            fontFamily: "Helvetica, Arial, sans-serif",
+            color: "#263238",
+          },
+        },
         labels: ["Manuscript Feedbacks", "Summary Feedbacks"],
+        colors: ["#6f42c1", "#fd7e14"],
         legend: {
           show: true,
           fontSize: "14px",
@@ -127,7 +163,7 @@ export default {
     this.series = [
       this.getAudioTextCount,
       this.getSummaryTextCount,
-      0,
+      this.getTotalFeedbackSubmissions,
       this.getTotalGenerations,
     ];
     this.feedbackSeries = [
@@ -161,6 +197,8 @@ export default {
 
       this.manuscriptFeedbackCount = data.manuscriptFeedbacks.length;
       this.summaryFeedbackCount = data.summaryFeedbacks.length;
+      this.getTotalFeedbackSubmissions =
+        this.manuscriptFeedbackCount + this.summaryFeedbackCount;
     },
   },
 };

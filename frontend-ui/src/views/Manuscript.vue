@@ -94,32 +94,37 @@
       v-if="manuscriptHistory.length"
     >
       <template #cell(actions)="row">
-        <b-button
-          id="show-btn"
-          variant="danger"
-          title="Delete File"
-          @click="showModal(row.item, $event.target)"
-          >Delete
-        </b-button>
-        &nbsp;
-        <b-button
-          id="download-btn"
-          variant="success"
-          title="Download File"
-          @click="downloadFile(row)"
-          v-if="!downloading"
-          ><b-icon icon="cloud-download" aria-hidden="true"></b-icon>
-        </b-button>
-
-        <b-button
-          class="btn btn-primary"
-          id="generateLoadingComponent"
-          variant="success"
-          disabled
-          v-if="downloading"
-        >
-          <LoadingComponent width="15"></LoadingComponent>
-        </b-button>
+        <b-row>
+          <b-col sm="3">
+            <button
+              class="btn btn-danger w-100"
+              variant="danger"
+              title="Delete File"
+              @click="showModal(row.item, $event.target)"
+            >
+              Delete
+            </button>
+          </b-col>
+          <b-col sm="3">
+            <button
+              class="btn btn-success w-100"
+              variant="success"
+              title="Download File"
+              @click="downloadFile(row)"
+              v-if="row.item._id !== downloadId"
+            >
+              <b-icon icon="cloud-download" aria-hidden="true"></b-icon>
+            </button>
+            <button
+              class="btn btn-success w-100"
+              variant="success"
+              disabled
+              v-if="row.item._id === downloadId"
+            >
+              <LoadingComponent width="15"></LoadingComponent>
+            </button>
+          </b-col>
+        </b-row>
       </template>
     </b-table>
 
@@ -154,7 +159,7 @@ export default {
       headings: ["No.", "audio_file", "description", "created", "actions"],
       manuscriptHistory: [],
       inProgress: false,
-      downloading: false,
+      downloadId: "",
       deleteModal: {
         id: "delete-modal",
         title: "",
@@ -238,10 +243,10 @@ export default {
       this.$root.$emit("bv::show::modal", this.deleteModal.id, button);
     },
     async downloadFile(row) {
+      this.downloadId = row.item._id;
       const {
         data: { data },
       } = await this.$store.dispatch("getUserDetails");
-      this.downloading = true;
       const _id = row.item._id;
       let doc = new jsPDF();
       let lineNum = 20;
@@ -271,6 +276,7 @@ export default {
         else lineNum += 20;
       });
       doc.save(pdfName + ".pdf");
+      this.downloadId = "";
     },
     async removeHistory(data) {
       const gcs_uri = data.audio_file;
