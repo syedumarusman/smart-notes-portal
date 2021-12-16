@@ -48,15 +48,57 @@
         </div>
       </div>
     </div>
+
+    <div class="row justify-content-center">
+      <div id="chart" class="col-4">
+        <apexchart
+          v-if="!emptyChart"
+          type="pie"
+          width="600"
+          :options="chartOptions"
+          :series="series"
+        ></apexchart>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import VueApexCharts from "vue-apexcharts";
+
 export default {
   name: "Dashboard",
+  components: {
+    apexchart: VueApexCharts,
+  },
   data() {
-    return {};
+    return {
+      series: [],
+      chartOptions: {
+        labels: ["Manuscripts", "Summaries", "Feedbacks", "Total Generations"],
+        legend: {
+          show: true,
+          fontSize: "14px",
+        },
+        dataLabels: {
+          enabled: true,
+          style: {
+            fontSize: "16px",
+            fontFamily: "Helvetica, Arial, sans-serif",
+            fontWeight: "bold",
+          },
+        },
+      },
+    };
+  },
+  created() {
+    this.series = [
+      this.getAudioTextCount,
+      this.getSummaryTextCount,
+      0,
+      this.getTotalGenerations,
+    ];
   },
   computed: {
     ...mapGetters([
@@ -64,6 +106,14 @@ export default {
       "getSummaryTextCount",
       "getTotalGenerations",
     ]),
+    emptyChart() {
+      return (
+        this.getAudioTextCount +
+          this.getSummaryTextCount +
+          this.getTotalGenerations ===
+        0
+      );
+    },
   },
   methods: {},
 };
