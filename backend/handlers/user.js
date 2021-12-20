@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const Boom = require("boom");
-const { User, FileSchema } = require("../models/user");
+const User = require("../models/user");
 const { getNewToken } = require("../utils/jwtService");
 const { JWT_SECRET_KEY } = require("../utils/constants");
 const ValidationSchemas = require("../validations/userSchema");
