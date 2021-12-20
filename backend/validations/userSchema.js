@@ -36,10 +36,10 @@ const updateSchema = Joi.object({
 })
 
 const FileSchema = Joi.object({
-  userId: Joi.string(),
-  description: Joi.string().max(100),
-  gcs_uri: Joi.string(),
-  created: Joi.string()
+  userId: Joi.string().required(),
+  description: Joi.string().max(100).required(),
+  gcs_uri: Joi.string().required(),
+  created: Joi.string().required()
 })
 
 const removeFileSchema = Joi.object({
