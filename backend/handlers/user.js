@@ -120,7 +120,7 @@ const update = async (payload) => {
 };
 
 const addSummaryFile = async (payload) => {
-  const { error } = ValidationSchemas.addFeedbackSchema.validate(payload);
+  const { error } = ValidationSchemas.FileSchema.validate(payload);
   if (error) {
     throw error;
   }

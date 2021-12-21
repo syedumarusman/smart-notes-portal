@@ -342,6 +342,12 @@ export default {
       this.submitModal.content = `Are you sure you want to submit feedback for ${this.feedbackType}?`;
       this.$root.$emit("bv::show::modal", this.submitModal.id);
     },
+    resetFields() {
+      this.q1 = "";
+      this.q2 = "";
+      this.q3 = "";
+      this.comment = "";
+    },
     validateFields() {
       if (
         this.q1 === "" ||
@@ -369,6 +375,7 @@ export default {
           this.handleDropDownSelected("Please select one");
         }
       }
+      this.resetFields();
     },
   },
 };
